@@ -1,0 +1,342 @@
+# FluxForge AI - Cursor Rules
+
+## Project Overview
+This is FluxForge AI, a production-ready Enterprise SaaS Builder with Agentic AI, RAG, RBAC, and Multi-Tenant Architecture. Built with Next.js 15, TypeScript, Supabase, and Stripe.
+
+## Architecture Principles
+
+### 1. Security First - Zero Trust Architecture
+- **Always** use Row-Level Security (RLS) for database queries
+- **Never** expose service role keys in client code
+- **Always** validate and sanitize user input
+- **Always** use parameterized queries to prevent SQL injection
+- **Always** verify webhook signatures before processing
+- **Always** sanitize PII before sending to AI models
+- **Always** use HTTPS in production
+- **Always** implement rate limiting on public endpoints
+
+### 2. Type Safety
+- **Always** use TypeScript strict mode
+- **Always** define interfaces for API responses
+- **Always** use Zod for runtime validation
+- **Never** use `any` type unless absolutely necessary
+- **Always** generate types from database schema
+
+### 3. Error Handling
+- **Always** wrap async operations in try-catch
+- **Always** log errors with context
+- **Always** return standardized error responses
+- **Never** expose internal error details to clients
+- **Always** use proper HTTP status codes
+
+### 4. Code Organization
+```
+src/
+├── app/                 # Next.js App Router (pages, API routes)
+├── lib/
+│   └── core/           # Core infrastructure (security, data, AI)
+├── components/         # Reusable React components
+├── hooks/              # Custom React hooks
+├── store/              # State management (Zustand)
+└── types/              # TypeScript type definitions
+```
+
+### 5. Naming Conventions
+- **Files**: kebab-case (e.g., `data-gateway.ts`, `ai-orchestrator.ts`)
+- **Components**: PascalCase (e.g., `UserProfile.tsx`)
+- **Functions**: camelCase (e.g., `getUserById`, `processWebhook`)
+- **Constants**: UPPER_SNAKE_CASE (e.g., `MAX_RETRIES`, `API_VERSION`)
+- **Interfaces**: PascalCase with descriptive names (e.g., `AIRequest`, `SecurityContext`)
+
+### 6. Database Practices
+- **Always** use the DataGateway for CRUD operations
+- **Always** pass userId for audit logging
+- **Never** bypass RLS policies
+- **Always** use transactions for multi-step operations
+- **Always** create indexes for frequently queried columns
+- **Always** validate foreign key relationships
+
+### 7. API Design
+- **RESTful** endpoints with proper HTTP verbs
+- **Always** return consistent JSON response format
+- **Always** use proper status codes (200, 201, 400, 401, 403, 404, 500)
+- **Always** implement pagination for list endpoints
+- **Always** version APIs if breaking changes are needed
+- **Always** document all endpoints
+
+### 8. Authentication & Authorization
+- **Always** use `withAuth` middleware for protected routes
+- **Always** check user permissions before operations
+- **Always** implement RBAC (Role-Based Access Control)
+- **Never** trust client-side auth state
+- **Always** validate JWT tokens on every request
+- **Always** log authentication events
+
+### 9. AI Integration
+- **Always** apply guardrails before AI processing
+- **Always** sanitize PII from prompts
+- **Always** implement token limits
+- **Always** provide fallback responses
+- **Always** log AI requests for monitoring
+- **Always** cache frequent queries
+
+### 10. Payment Processing
+- **Always** verify webhook signatures
+- **Always** use idempotency keys for payment operations
+- **Always** log all payment events
+- **Always** handle retry logic for failed webhooks
+- **Never** store raw credit card data
+- **Always** use test mode before production
+
+## Code Standards
+
+### TypeScript
+```typescript
+// GOOD - Strict typing with proper error handling
+async function createProject(
+  data: ProjectInsert,
+  userId: string
+): Promise<Project | null> {
+  try {
+    const gateway = new DataGateway();
+    const project = await gateway.createProject(data);
+    
+    if (!project) {
+      throw new Error('Failed to create project');
+    }
+    
+    return project;
+  } catch (error) {
+    console.error('createProject error:', error);
+    throw error;
+  }
+}
+
+// BAD - No types, no error handling
+async function createProject(data, userId) {
+  const gateway = new DataGateway();
+  return gateway.createProject(data);
+}
+```
+
+### API Routes
+```typescript
+// GOOD - Proper middleware, validation, error handling
+import { z } from 'zod';
+import { withAuth } from '@/lib/core/security';
+
+const schema = z.object({
+  name: z.string().min(1).max(100),
+  description: z.string().optional(),
+});
+
+async function handler(req: NextRequest, context: SecurityContext) {
+  try {
+    const body = await req.json();
+    const validated = schema.parse(body);
+    
+    // Process request
+    const result = await someOperation(validated);
+    
+    return NextResponse.json({ success: true, data: result });
+  } catch (error) {
+    if (error instanceof z.ZodError) {
+      return NextResponse.json(
+        { error: 'Validation error', details: error.errors },
+        { status: 400 }
+      );
+    }
+    return NextResponse.json(
+      { error: 'Internal error' },
+      { status: 500 }
+    );
+  }
+}
+
+export const POST = withAuth(handler, { requiredRole: 'editor' });
+```
+
+### React Components
+```typescript
+// GOOD - TypeScript, proper prop types, error boundaries
+interface UserCardProps {
+  userId: string;
+  onUpdate?: (user: User) => void;
+}
+
+export function UserCard({ userId, onUpdate }: UserCardProps) {
+  const [user, setUser] = useState<User | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    fetchUser();
+  }, [userId]);
+
+  const fetchUser = async () => {
+    try {
+      const response = await fetch(`/api/users/${userId}`);
+      const data = await response.json();
+      setUser(data.user);
+    } catch (err) {
+      setError('Failed to load user');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  if (loading) return <Spinner />;
+  if (error) return <ErrorMessage message={error} />;
+  if (!user) return null;
+
+  return (
+    <div className="glass-card p-6">
+      <h3>{user.fullName}</h3>
+      <p>{user.email}</p>
+    </div>
+  );
+}
+```
+
+## Performance Guidelines
+
+### 1. Database Queries
+- Use indexes for WHERE, JOIN, ORDER BY columns
+- Limit result sets with LIMIT/OFFSET
+- Use connection pooling
+- Cache frequent queries
+- Avoid N+1 queries
+
+### 2. API Optimization
+- Implement response caching
+- Use CDN for static assets
+- Enable compression (gzip/brotli)
+- Minimize payload sizes
+- Use pagination for large datasets
+
+### 3. Frontend Performance
+- Use Next.js Image component for images
+- Implement code splitting
+- Lazy load components
+- Minimize bundle size
+- Use React.memo for expensive components
+
+## Testing Requirements
+
+### Unit Tests
+```typescript
+describe('DataGateway', () => {
+  it('should create user with hashed password', async () => {
+    const gateway = new DataGateway();
+    const user = await gateway.createUser({
+      email: 'test@example.com',
+      password_hash: 'hashed_password',
+      full_name: 'Test User',
+    });
+    
+    expect(user).toBeDefined();
+    expect(user?.email).toBe('test@example.com');
+  });
+});
+```
+
+### Integration Tests
+- Test API endpoints with real database
+- Test webhook processing
+- Test authentication flows
+- Test payment integrations (use test mode)
+
+## Security Checklist
+
+Before deploying:
+- [ ] All secrets are in environment variables
+- [ ] RLS policies are enabled and tested
+- [ ] Webhook signatures are verified
+- [ ] Rate limiting is implemented
+- [ ] CORS is properly configured
+- [ ] SQL injection prevention is in place
+- [ ] XSS protection is enabled
+- [ ] CSRF tokens are used for forms
+- [ ] PII sanitization is working
+- [ ] Audit logging is enabled
+
+## Common Patterns
+
+### Webhook Processing
+```typescript
+export async function POST(req: NextRequest) {
+  const signature = req.headers.get('webhook-signature');
+  const body = await req.text();
+  
+  // 1. Verify signature
+  if (!verifySignature(body, signature)) {
+    return NextResponse.json({ error: 'Invalid signature' }, { status: 401 });
+  }
+  
+  // 2. Log event
+  const event = await dataGateway.createWebhookEvent({ ... });
+  
+  // 3. Process event
+  try {
+    await processEvent(JSON.parse(body));
+    await dataGateway.updateWebhookStatus(event.id, 'succeeded');
+  } catch (error) {
+    await dataGateway.updateWebhookStatus(event.id, 'failed', error.message);
+  }
+  
+  // 4. Always return 200
+  return NextResponse.json({ received: true });
+}
+```
+
+### Protected Routes
+```typescript
+export const GET = withAuth(async (req, context) => {
+  // context.userId, context.organizationId, context.role are available
+  const data = await fetchUserData(context.userId);
+  return NextResponse.json({ data });
+}, { requiredRole: 'admin' });
+```
+
+### AI Processing with Guardrails
+```typescript
+const orchestrator = new AIOrchestrator();
+const response = await orchestrator.processRequest({
+  prompt: sanitizedInput,
+  userId: context.userId,
+  organizationId: context.organizationId,
+  projectId: projectId,
+});
+```
+
+## Deployment Checklist
+
+- [ ] Environment variables configured
+- [ ] Database migrations applied
+- [ ] Webhook URLs updated
+- [ ] SSL certificates active
+- [ ] Monitoring enabled
+- [ ] Error tracking configured
+- [ ] Backups scheduled
+- [ ] Rate limiting enabled
+- [ ] CDN configured
+- [ ] Performance testing completed
+
+## Support & Resources
+
+- Documentation: `/docs/`
+- API Reference: `/docs/API.md`
+- Deployment Guide: `/docs/DEPLOYMENT.md`
+- Database Schema: `/supabase/schema.sql`
+- Core Libraries: `/src/lib/core/`
+
+## Remember
+
+1. **Security is not optional** - Every decision must consider security implications
+2. **Type safety prevents bugs** - Use TypeScript strictly
+3. **User data is sacred** - Protect PII and implement proper RLS
+4. **Performance matters** - Optimize database queries and API responses
+5. **Monitoring is essential** - Log everything important
+6. **Documentation helps everyone** - Comment complex logic
+7. **Testing prevents disasters** - Write tests for critical paths
+8. **Backups save lives** - Regular backups of database and configs

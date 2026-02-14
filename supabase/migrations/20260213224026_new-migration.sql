@@ -1,0 +1,2 @@
+-- Placeholder migration (new-migration). Add SQL here if needed.
+-- Truth Ledger and other migrations are in separate files.

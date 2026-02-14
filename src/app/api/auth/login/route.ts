@@ -1,0 +1,149 @@
+// =====================================================
+// AUTHENTICATION API - LOGIN (SUPABASE NATIVE)
+// =====================================================
+// Verifies password via Supabase Auth (signInWithPassword). No password_hash lookup.
+// Returns Supabase session token so server getSession() and dashboard auth work.
+
+import { NextRequest, NextResponse } from 'next/server';
+import { createClient } from '@supabase/supabase-js';
+import { z } from 'zod';
+import DataGateway from '@/lib/core/data-gateway';
+import { AuditLogger } from '@/lib/core/audit';
+
+const loginSchema = z.object({
+  email: z.string().email('Invalid email address'),
+  password: z.string().min(1, 'Password is required'),
+});
+
+const supabaseAdmin = createClient(
+  process.env.NEXT_PUBLIC_SUPABASE_URL!,
+  process.env.SUPABASE_SERVICE_ROLE_KEY!,
+  {
+    auth: {
+      autoRefreshToken: false,
+      persistSession: false,
+    },
+  }
+);
+
+export async function POST(req: NextRequest) {
+  const dataGateway = new DataGateway(true);
+  const auditLogger = new AuditLogger();
+
+  if (!process.env.NEXT_PUBLIC_SUPABASE_URL || !process.env.SUPABASE_SERVICE_ROLE_KEY) {
+    return NextResponse.json(
+      { error: 'Server misconfiguration', code: 'MISSING_ENV' },
+      { status: 500 }
+    );
+  }
+
+  try {
+    const body = await req.json();
+    const validated = loginSchema.parse(body);
+
+    // 1. Verify credentials with Supabase Auth (source of truth)
+    const { data: authData, error: authError } = await supabaseAdmin.auth.signInWithPassword({
+      email: validated.email,
+      password: validated.password,
+    });
+
+    if (authError) {
+      return NextResponse.json(
+        { error: 'Invalid credentials', code: 'INVALID_CREDENTIALS' },
+        { status: 401 }
+      );
+    }
+
+    if (!authData.session?.user) {
+      return NextResponse.json(
+        { error: 'Invalid credentials', code: 'INVALID_CREDENTIALS' },
+        { status: 401 }
+      );
+    }
+
+    const userId = authData.session.user.id;
+
+    // 2. Load profile and org from public tables (same id as Auth)
+    const user = await dataGateway.findById('users', userId);
+    if (!user) {
+      return NextResponse.json(
+        { error: 'No profile found', code: 'NO_PROFILE' },
+        { status: 400 }
+      );
+    }
+
+    const userOrgs = await dataGateway.getUserOrganizations(userId);
+    const defaultOrg = userOrgs[0]?.organizations;
+    if (!defaultOrg) {
+      return NextResponse.json(
+        { error: 'No organization found', code: 'NO_ORGANIZATION' },
+        { status: 400 }
+      );
+    }
+
+    const subscription = await dataGateway.getActiveSubscription(defaultOrg.id);
+
+    // 3. Update last login
+    await dataGateway.update('users', userId, {
+      last_login_at: new Date().toISOString(),
+    });
+
+    const clientIp =
+      req.headers.get('x-forwarded-for')?.split(',')[0]?.trim() ??
+      req.headers.get('x-real-ip') ??
+      'unknown';
+    try {
+      await auditLogger.logAuthEvent(userId, 'LOGIN', {
+        email: user.email,
+        organizationId: defaultOrg.id,
+        ip: clientIp,
+      });
+    } catch {
+      /* non-fatal */
+    }
+
+    // 4. Return Supabase session tokens; set cookie so middleware allows /dashboard
+    const response = NextResponse.json({
+      success: true,
+      user: {
+        id: user.id,
+        email: user.email,
+        fullName: user.full_name,
+        role: user.role,
+        avatarUrl: user.avatar_url,
+      },
+      organization: {
+        id: defaultOrg.id,
+        name: defaultOrg.name,
+        slug: defaultOrg.slug,
+      },
+      subscription: subscription
+        ? { tier: subscription.tier, status: subscription.status }
+        : null,
+      token: authData.session.access_token,
+      refresh_token: authData.session.refresh_token ?? undefined,
+    });
+
+    response.cookies.set('fluxforge_token', authData.session.access_token, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === 'production',
+      sameSite: 'lax',
+      maxAge: 60 * 60 * 24 * 7, // 7 days
+      path: '/',
+    });
+
+    return response;
+  } catch (error: unknown) {
+    if (error instanceof z.ZodError) {
+      return NextResponse.json(
+        { error: 'Validation error', details: error.errors },
+        { status: 400 }
+      );
+    }
+    console.error('Login error:', error);
+    return NextResponse.json(
+      { error: 'Internal server error' },
+      { status: 500 }
+    );
+  }
+}
