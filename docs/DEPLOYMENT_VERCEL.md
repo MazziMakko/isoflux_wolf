@@ -6,7 +6,7 @@
 
 ## ✅ Pre-deploy checklist
 
-- [ ] **Env vars** in Vercel: all from `.env.production.example` (no secrets in repo).
+- [ ] **Secrets only in Vercel:** All keys (Supabase, Stripe, JWT, etc.) are set in Vercel → Settings → Environment Variables. The repo must never contain real keys; use `.env.production.example` as the list of variable names (placeholders only).
 - [ ] **Supabase**: `NEXT_PUBLIC_SUPABASE_URL`, `NEXT_PUBLIC_SUPABASE_ANON_KEY`, `SUPABASE_SERVICE_ROLE_KEY`, `DATABASE_URL` (for migrations; optional on Vercel if you run migrations locally).
 - [ ] **Stripe**: Live keys for production; set webhook URL to `https://www.isoflux.app/api/webhooks/stripe` (or your Vercel domain).
 - [ ] **App URL**: `NEXT_PUBLIC_APP_URL=https://www.isoflux.app` (emails, redirects, canonical).
@@ -81,9 +81,23 @@ Mark sensitive vars as **Sensitive** in Vercel so they are masked in logs.
 
 ## 📁 Repo files used
 
-- `vercel.json` — install command, security headers, region.
+- `vercel.json` — install command, security headers, region, API route `maxDuration: 60`.
+- `.nvmrc` — Node 20 (Vercel uses this for build and runtime).
 - `.env.production.example` — reference for required env (do not deploy this file with secrets).
-- `next.config.*` — Next.js config (no overrides needed for Vercel unless you add them).
+- `next.config.*` — Next.js config; images use `remotePatterns` only (Next 15).
+
+---
+
+## 🔧 Troubleshooting
+
+| Issue | Fix |
+|-------|-----|
+| Build fails: Node version | Repo has `.nvmrc` with `20`. In Vercel → Settings → General, set Node.js Version to **20.x** if needed. |
+| Build fails: module not found | Run `npm install --legacy-peer-deps` locally; ensure `installCommand` in `vercel.json` matches. |
+| Build fails: ESLint/TypeScript | Build is set to ignore lint/type errors (`next.config.js`). To enforce, set `ignoreDuringBuilds: false` and `ignoreBuildErrors: false` after fixing issues. |
+| Runtime 500 on API routes | Add required env vars in Vercel (Supabase, JWT_SECRET, etc.). Check Vercel → Deployments → Function logs. |
+| API route timeout | `vercel.json` sets `maxDuration: 60` for `app/api/**`. On Hobby plan max is 10s; upgrade or reduce work. |
+| Blank page / wrong URL | Set `NEXT_PUBLIC_APP_URL` to your production URL so redirects and links point to the live site. |
 
 ---
 

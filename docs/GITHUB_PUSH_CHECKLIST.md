@@ -13,18 +13,22 @@ git add .
 git status
 git commit -m "Initial commit: IsoFlux (The Compliance Wolf)"
 git branch -M main
-git remote add origin https://github.com/YOUR_ORG/isoflux.git
+# If no remote yet:
+git remote add origin https://github.com/MazziMakko/isoflux_wolf.git
+# If origin already exists (e.g. was YOUR_ORG placeholder), update it:
+git remote set-url origin https://github.com/MazziMakko/isoflux_wolf.git
 git push -u origin main
 ```
 
-If the repo already exists on GitHub, clone it first or add the remote to an existing init.
+If the repo already exists on GitHub, clone it first or add/update the remote as above.
 
 ## 1. Never commit secrets
 
 - **`.env`** – ignored; never add. Contains local Supabase keys, `DATABASE_URL`, Stripe, JWT, etc.
-- **`.env.production`** – ignored; never add.
-- **`.env.local`**, **`.env.development`** – ignored.
-- Only **`.env.example`** and **`.env.production.example`** are committed (placeholders only).
+- **`.env.production`** – ignored; never add (deployment uses Vercel/host env vars only).
+- **`.env.local`**, **`.env.*.local`**, **`.env.development`** – ignored.
+- Only **`.env.example`** and **`.env.production.example`** are committed, and they must contain **placeholders only** (no real keys, no real DB URLs).
+- **Deployment:** Set all secrets in Vercel (or your host) → Environment Variables. The app never reads keys from the repo at build or runtime.
 
 If you ever added `.env` or another env file with real keys:
 
@@ -62,11 +66,12 @@ git diff --cached | grep -E "password|secret|sk_live|sk_test|SUPABASE_SERVICE_RO
 git add .
 git status
 git commit -m "Your message"
-git remote add origin https://github.com/YOUR_ORG/isoflux.git   # first time only
+git remote add origin https://github.com/MazziMakko/isoflux_wolf.git   # first time only
 git push -u origin main
 ```
 
 ## 5. After push
 
-- Set **Secrets** / **Environment variables** in GitHub (Actions) or in your host (Vercel, etc.) – never in the repo.
-- Use **`.env.example`** and **`.env.production.example`** as the list of required variables.
+- Set **Secrets** / **Environment variables** in GitHub (Actions) or in your host (Vercel, etc.) – never in the repo. Deployment must pull keys from the platform only, not from any file in the repo.
+- Use **`.env.example`** and **`.env.production.example`** as the list of variable names (placeholders only in repo).
+- If **`.env.example` was ever committed with real keys in the past:** Rotate those credentials (Supabase service role key, database password, Stripe keys) and ensure the repo now has placeholders only.

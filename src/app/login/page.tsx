@@ -30,17 +30,25 @@ export default function LoginPage() {
       const data = await response.json();
 
       if (!response.ok) {
-        throw new Error(data.error || 'Login failed');
+        throw new Error(data.error || (data.code === 'NO_PROFILE' ? 'Account not set up. Please sign up first.' : 'Login failed'));
       }
 
-      // Set Supabase session (cookies) so server getSession() works for dashboard/API
-      if (data.token) {
-        await setSupabaseSession(data.token, data.refresh_token);
-      }
-
+      // Persist for dashboard and API (Bearer token fallback)
       localStorage.setItem('fluxforge_token', data.token);
       localStorage.setItem('fluxforge_user', JSON.stringify(data.user));
       localStorage.setItem('fluxforge_org', JSON.stringify(data.organization));
+
+      // Set Supabase session in cookies so server getSession() works (with 3s timeout so we don't stall)
+      if (data.token) {
+        try {
+          await Promise.race([
+            setSupabaseSession(data.token, data.refresh_token),
+            new Promise((_, reject) => setTimeout(() => reject(new Error('timeout')), 3000)),
+          ]);
+        } catch (_) {
+          // Proceed anyway; API routes will use Bearer / fluxforge_token cookie
+        }
+      }
 
       router.push('/dashboard');
     } catch (err: any) {

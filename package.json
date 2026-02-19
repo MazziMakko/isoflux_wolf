@@ -13,7 +13,8 @@
     "test:ci": "jest --ci",
     "analyze": "ANALYZE=true npm run build",
     "db:migrate:truth-ledger": "node scripts/run-truth-ledger-migration.js",
-    "db:migrate:base": "node scripts/run-base-schema-migration.js"
+    "db:migrate:base": "node scripts/run-base-schema-migration.js",
+    "force-entry": "npx tsx scripts/force-entry.ts"
   },
   "dependencies": {
     "@hookform/resolvers": "^3.3.4",

@@ -8,6 +8,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import type { Database } from '@/types/database.types';
 import { verifyJWT, hashPassword, comparePassword } from './crypto';
 import { AuditLogger } from './audit';
+import DataGateway from './data-gateway';
 
 export interface SecurityContext {
   userId: string | null;
@@ -66,13 +67,39 @@ export class SecurityKernel {
   }
 
   /**
-   * Extract and validate security context from request
+   * Extract and validate security context from request.
+   * 1) Tries Supabase session from cookies (set by setSupabaseSession after login).
+   * 2) Fallback: Bearer token or fluxforge_token cookie (so dashboard/API work even if Supabase cookies aren't in sync).
    */
   async getSecurityContext(req: NextRequest): Promise<SecurityContext> {
     const supabase = await this.createSecureClient();
     const { data: { session }, error } = await supabase.auth.getSession();
 
-    if (error || !session) {
+    let userId: string | null = null;
+    let sessionId: string | null = null;
+    let fromTokenFallback = false;
+
+    if (!error && session?.user) {
+      userId = session.user.id;
+      sessionId = session.access_token;
+    }
+
+    // Fallback: token from cookie or Authorization header (login/signup set fluxforge_token; dashboard sends Bearer)
+    if (!userId) {
+      const token =
+        req.cookies.get('fluxforge_token')?.value ??
+        req.headers.get('authorization')?.replace(/^Bearer\s+/i, '')?.trim();
+      if (token) {
+        const user = await this.validateSupabaseAccessToken(token);
+        if (user) {
+          userId = user.id;
+          sessionId = token;
+          fromTokenFallback = true;
+        }
+      }
+    }
+
+    if (!userId) {
       return {
         userId: null,
         organizationId: null,
@@ -82,20 +109,62 @@ export class SecurityKernel {
       };
     }
 
-    // Fetch user's organization and role
-    const { data: memberData } = await supabase
+    // Fetch user's first organization and role (use limit(1) so multiple orgs don't break .single())
+    let memberData: { organization_id: string; role: string | null; permissions: string[] } | null = null;
+
+    const { data: members } = await supabase
       .from('organization_members')
       .select('organization_id, role, permissions')
-      .eq('user_id', session.user.id)
-      .single();
+      .eq('user_id', userId)
+      .limit(1);
+
+    if (Array.isArray(members) && members.length > 0) {
+      memberData = members[0] as { organization_id: string; role: string | null; permissions: string[] };
+    }
+
+    // When auth was via token fallback, cookie client has no session so RLS may return no rows; use service role
+    if (fromTokenFallback && !memberData) {
+      const dataGateway = new DataGateway(true);
+      const userOrgs = await dataGateway.getUserOrganizations(userId);
+      const first = userOrgs[0];
+      if (first) {
+        memberData = {
+          organization_id: first.organization_id,
+          role: first.role,
+          permissions: (first.permissions as string[]) ?? [],
+        };
+      }
+    }
 
     return {
-      userId: session.user.id,
-      organizationId: memberData?.organization_id || null,
-      role: memberData?.role || null,
-      permissions: (memberData?.permissions as string[]) || [],
-      sessionId: session.access_token,
+      userId,
+      organizationId: memberData?.organization_id ?? null,
+      role: memberData?.role ?? null,
+      permissions: (memberData?.permissions as string[]) ?? [],
+      sessionId,
     };
+  }
+
+  /**
+   * Validate Supabase access token (JWT) via Auth API so API routes work with Bearer/fluxforge_token.
+   */
+  private async validateSupabaseAccessToken(accessToken: string): Promise<{ id: string } | null> {
+    const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
+    const anonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
+    if (!url || !anonKey) return null;
+    try {
+      const res = await fetch(`${url}/auth/v1/user`, {
+        headers: {
+          Authorization: `Bearer ${accessToken}`,
+          apikey: anonKey,
+        },
+      });
+      if (!res.ok) return null;
+      const data = await res.json();
+      return data?.id ? { id: data.id } : null;
+    } catch {
+      return null;
+    }
   }
 
   /**

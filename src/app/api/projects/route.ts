@@ -17,6 +17,13 @@ const createProjectSchema = z.object({
 
 // GET /api/projects - List projects
 async function handleGet(req: NextRequest, context: any) {
+  if (!context.organizationId) {
+    return NextResponse.json(
+      { error: 'No organization', code: 'NO_ORGANIZATION' },
+      { status: 403 }
+    );
+  }
+
   const dataGateway = new DataGateway();
 
   try {

@@ -37,27 +37,68 @@ export default function DashboardPage() {
     const userData = localStorage.getItem('fluxforge_user');
     const orgData = localStorage.getItem('fluxforge_org');
 
-    if (userData) setUser(JSON.parse(userData));
-    if (orgData) setOrganization(JSON.parse(orgData));
+    if (userData) {
+      try {
+        setUser(JSON.parse(userData));
+      } catch {
+        setUser(null);
+      }
+    }
+    if (orgData) {
+      try {
+        setOrganization(JSON.parse(orgData));
+      } catch {
+        setOrganization(null);
+      }
+    }
 
     fetchProjects();
   }, [router]);
 
   const fetchProjects = async () => {
+    const token = localStorage.getItem('fluxforge_token');
+    if (!token) {
+      setLoading(false);
+      router.push('/login');
+      return;
+    }
+
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 15000);
+
     try {
-      const token = localStorage.getItem('fluxforge_token');
       const response = await fetch('/api/projects', {
         headers: {
-          'Authorization': `Bearer ${token}`,
+          Authorization: `Bearer ${token}`,
         },
+        signal: controller.signal,
       });
+
+      clearTimeout(timeoutId);
+
+      if (response.status === 401) {
+        localStorage.removeItem('fluxforge_token');
+        localStorage.removeItem('fluxforge_user');
+        localStorage.removeItem('fluxforge_org');
+        router.push('/login');
+        return;
+      }
+
+      if (response.status === 403 && (await response.json().catch(() => ({}))).code === 'NO_ORGANIZATION') {
+        setProjects([]);
+        return;
+      }
 
       if (response.ok) {
         const data = await response.json();
         setProjects(data.projects || []);
       }
     } catch (error) {
-      console.error('Failed to fetch projects:', error);
+      if ((error as Error).name === 'AbortError') {
+        console.error('Projects request timed out');
+      } else {
+        console.error('Failed to fetch projects:', error);
+      }
     } finally {
       setLoading(false);
     }
