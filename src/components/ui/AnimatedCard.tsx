@@ -153,3 +153,6 @@ export function AnimatedCardGrid({
     </motion.div>
   );
 }
+
+// Named export alias for convenience
+export { AnimatedCard as Card };

@@ -1,0 +1,418 @@
+// =====================================================
+// ISOFLUX: THE WOLF SHIELD - HUD-COMPLIANT SCHEMA
+// Prisma Schema with Cryptographic Append-Only Ledger
+// =====================================================
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+// =====================================================
+// ENUMS
+// =====================================================
+
+enum UserRole {
+  SUPER_ADMIN      @map("super_admin")
+  PROPERTY_MANAGER @map("property_manager")
+  TENANT           @map("tenant")
+  ADMIN            @map("admin")
+  EDITOR           @map("editor")
+  VIEWER           @map("viewer")
+  CUSTOMER         @map("customer")
+
+  @@map("user_role")
+}
+
+enum SubscriptionTier {
+  FREE       @map("free")
+  STARTER    @map("starter")
+  PRO        @map("pro")
+  ENTERPRISE @map("enterprise")
+
+  @@map("subscription_tier")
+}
+
+enum SubscriptionStatus {
+  ACTIVE     @map("active")
+  CANCELLED  @map("cancelled")
+  PAST_DUE   @map("past_due")
+  TRIALING   @map("trialing")
+  INCOMPLETE @map("incomplete")
+
+  @@map("subscription_status")
+}
+
+enum TransactionType {
+  CHARGE                @map("CHARGE")
+  PAYMENT               @map("PAYMENT")
+  ADJUSTMENT            @map("ADJUSTMENT")
+  FEE                   @map("FEE")
+  RECERTIFICATION_LOG   @map("RECERTIFICATION_LOG")
+  MAINTENANCE_REQUEST   @map("MAINTENANCE_REQUEST")
+  MAINTENANCE_APPROVAL  @map("MAINTENANCE_APPROVAL")
+
+  @@map("transaction_type")
+}
+
+enum RecertificationStatus {
+  PENDING   @map("PENDING")
+  APPROVED  @map("APPROVED")
+  OVERDUE   @map("OVERDUE")
+  COMPLETED @map("COMPLETED")
+
+  @@map("recertification_status")
+}
+
+enum UnitStatus {
+  VACANT    @map("VACANT")
+  OCCUPIED  @map("OCCUPIED")
+  MAINTENANCE @map("MAINTENANCE")
+  RESERVED  @map("RESERVED")
+
+  @@map("unit_status")
+}
+
+// =====================================================
+// CORE TABLES
+// =====================================================
+
+model User {
+  id              String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  email           String    @unique @db.VarChar(255)
+  emailVerified   Boolean   @default(false) @map("email_verified")
+  passwordHash    String    @map("password_hash")
+  fullName        String?   @map("full_name") @db.VarChar(255)
+  avatarUrl       String?   @map("avatar_url")
+  role            UserRole  @default(CUSTOMER)
+  metadata        Json      @default("{}")
+  lastLoginAt     DateTime? @map("last_login_at") @db.Timestamptz
+  createdAt       DateTime  @default(now()) @map("created_at") @db.Timestamptz
+  updatedAt       DateTime  @updatedAt @map("updated_at") @db.Timestamptz
+  deletedAt       DateTime? @map("deleted_at") @db.Timestamptz
+
+  // Relations
+  ownedOrganizations   Organization[]    @relation("OrganizationOwner")
+  organizationMembers  OrganizationMember[]
+  createdProjects      Project[]
+  apiKeysCreated       ApiKey[]
+  auditLogs            AuditLog[]
+  createdLedgerEntries HudAppendLedger[]
+  tenantProfiles       Tenant[]
+
+  @@index([email])
+  @@index([role])
+  @@map("users")
+}
+
+model Organization {
+  id        String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  ownerId   String   @map("owner_id") @db.Uuid
+  name      String   @db.VarChar(255)
+  slug      String   @unique @db.VarChar(255)
+  logoUrl   String?  @map("logo_url")
+  settings  Json     @default("{}")
+  metadata  Json     @default("{}")
+  createdAt DateTime @default(now()) @map("created_at") @db.Timestamptz
+  updatedAt DateTime @updatedAt @map("updated_at") @db.Timestamptz
+
+  // HUD-specific
+  hudCertificationNumber String?  @map("hud_certification_number") @db.VarChar(100)
+  complianceHealth       Decimal? @map("compliance_health") @db.Decimal(5, 2) // 0-100%
+  lastAuditDate          DateTime? @map("last_audit_date") @db.Timestamptz
+
+  // Relations
+  owner         User                 @relation("OrganizationOwner", fields: [ownerId], references: [id], onDelete: Cascade)
+  members       OrganizationMember[]
+  subscriptions Subscription[]
+  projects      Project[]
+  transactions  Transaction[]
+  auditLogs     AuditLog[]
+  apiKeys       ApiKey[]
+  properties    Property[]
+  ledgerEntries HudAppendLedger[]
+
+  @@index([slug])
+  @@map("organizations")
+}
+
+model OrganizationMember {
+  id             String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  organizationId String   @map("organization_id") @db.Uuid
+  userId         String   @map("user_id") @db.Uuid
+  role           UserRole @default(VIEWER)
+  permissions    Json     @default("[]")
+  invitedBy      String?  @map("invited_by") @db.Uuid
+  joinedAt       DateTime @default(now()) @map("joined_at") @db.Timestamptz
+
+  // Relations
+  organization Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  user         User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([organizationId, userId])
+  @@index([organizationId])
+  @@index([userId])
+  @@map("organization_members")
+}
+
+model Subscription {
+  id                   String             @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  organizationId       String             @map("organization_id") @db.Uuid
+  stripeSubscriptionId String?            @unique @map("stripe_subscription_id") @db.VarChar(255)
+  stripeCustomerId     String?            @map("stripe_customer_id") @db.VarChar(255)
+  tier                 SubscriptionTier   @default(FREE)
+  status               SubscriptionStatus @default(TRIALING)
+  currentPeriodStart   DateTime?          @map("current_period_start") @db.Timestamptz
+  currentPeriodEnd     DateTime?          @map("current_period_end") @db.Timestamptz
+  cancelAtPeriodEnd    Boolean            @default(false) @map("cancel_at_period_end")
+  trialEnd             DateTime?          @map("trial_end") @db.Timestamptz
+  metadata             Json               @default("{}")
+  createdAt            DateTime           @default(now()) @map("created_at") @db.Timestamptz
+  updatedAt            DateTime           @updatedAt @map("updated_at") @db.Timestamptz
+
+  // Relations
+  organization Organization  @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  transactions Transaction[]
+
+  @@index([organizationId])
+  @@index([status])
+  @@map("subscriptions")
+}
+
+// =====================================================
+// HUD-SPECIFIC TABLES
+// =====================================================
+
+model Property {
+  id             String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  organizationId String   @map("organization_id") @db.Uuid
+  name           String   @db.VarChar(255)
+  address        String   @db.VarChar(500)
+  city           String   @db.VarChar(100)
+  state          String   @db.VarChar(2)
+  zipCode        String   @map("zip_code") @db.VarChar(10)
+  hudPropertyId  String?  @unique @map("hud_property_id") @db.VarChar(100)
+  totalUnits     Int      @default(0) @map("total_units")
+  metadata       Json     @default("{}")
+  createdAt      DateTime @default(now()) @map("created_at") @db.Timestamptz
+  updatedAt      DateTime @updatedAt @map("updated_at") @db.Timestamptz
+
+  // Relations
+  organization  Organization      @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  units         Unit[]
+  ledgerEntries HudAppendLedger[]
+
+  @@index([organizationId])
+  @@index([hudPropertyId])
+  @@map("properties")
+}
+
+model Unit {
+  id             String     @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  propertyId     String     @map("property_id") @db.Uuid
+  unitNumber     String     @map("unit_number") @db.VarChar(50)
+  bedrooms       Int        @default(0)
+  bathrooms      Decimal    @default(0) @db.Decimal(3, 1)
+  squareFeet     Int?       @map("square_feet")
+  rentAmount     Decimal    @map("rent_amount") @db.Decimal(10, 2)
+  status         UnitStatus @default(VACANT)
+  currentTenantId String?   @map("current_tenant_id") @db.Uuid
+  metadata       Json       @default("{}")
+  createdAt      DateTime   @default(now()) @map("created_at") @db.Timestamptz
+  updatedAt      DateTime   @updatedAt @map("updated_at") @db.Timestamptz
+
+  // Relations
+  property       Property          @relation(fields: [propertyId], references: [id], onDelete: Cascade)
+  currentTenant  Tenant?           @relation("CurrentTenant", fields: [currentTenantId], references: [id])
+  tenants        Tenant[]          @relation("UnitTenants")
+  ledgerEntries  HudAppendLedger[]
+
+  @@unique([propertyId, unitNumber])
+  @@index([propertyId])
+  @@index([status])
+  @@index([currentTenantId])
+  @@map("units")
+}
+
+model Tenant {
+  id                     String                 @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  userId                 String                 @map("user_id") @db.Uuid
+  unitId                 String                 @map("unit_id") @db.Uuid
+  firstName              String                 @map("first_name") @db.VarChar(100)
+  lastName               String                 @map("last_name") @db.VarChar(100)
+  email                  String                 @db.VarChar(255)
+  phone                  String?                @db.VarChar(20)
+  leaseStartDate         DateTime               @map("lease_start_date") @db.Timestamptz
+  leaseEndDate           DateTime               @map("lease_end_date") @db.Timestamptz
+  recertificationStatus  RecertificationStatus  @default(PENDING) @map("recertification_status")
+  nextRecertificationDue DateTime?              @map("next_recertification_due") @db.Timestamptz
+  metadata               Json                   @default("{}")
+  createdAt              DateTime               @default(now()) @map("created_at") @db.Timestamptz
+  updatedAt              DateTime               @updatedAt @map("updated_at") @db.Timestamptz
+
+  // Relations
+  user          User              @relation(fields: [userId], references: [id], onDelete: Cascade)
+  unit          Unit              @relation("UnitTenants", fields: [unitId], references: [id], onDelete: Cascade)
+  currentUnits  Unit[]            @relation("CurrentTenant")
+  ledgerEntries HudAppendLedger[]
+
+  @@index([userId])
+  @@index([unitId])
+  @@index([recertificationStatus])
+  @@map("tenants")
+}
+
+// =====================================================
+// THE WOLF SHIELD: APPEND-ONLY LEDGER
+// Mathematical Certainty via SHA-256 Chaining
+// =====================================================
+
+model HudAppendLedger {
+  id                String          @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  organizationId    String          @map("organization_id") @db.Uuid
+  propertyId        String          @map("property_id") @db.Uuid
+  unitId            String          @map("unit_id") @db.Uuid
+  tenantId          String?         @map("tenant_id") @db.Uuid
+  transactionType   TransactionType @map("transaction_type")
+  amount            Decimal         @default(0.00) @db.Decimal(10, 2)
+  description       String
+  accountingPeriod  String          @map("accounting_period") @db.VarChar(7) // YYYY-MM
+  isPeriodClosed    Boolean         @default(false) @map("is_period_closed")
+  cryptographicHash String          @map("cryptographic_hash") @db.VarChar(64) // SHA-256
+  previousHash      String?         @map("previous_hash") @db.VarChar(64)
+  createdAt         DateTime        @default(now()) @map("created_at") @db.Timestamptz
+  createdBy         String          @map("created_by") @db.Uuid
+
+  // Relations
+  organization Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  property     Property     @relation(fields: [propertyId], references: [id], onDelete: Cascade)
+  unit         Unit         @relation(fields: [unitId], references: [id], onDelete: Cascade)
+  tenant       Tenant?      @relation(fields: [tenantId], references: [id])
+  creator      User         @relation(fields: [createdBy], references: [id])
+
+  @@index([organizationId, accountingPeriod], name: "idx_ledger_org_period")
+  @@index([propertyId])
+  @@index([unitId])
+  @@index([tenantId])
+  @@index([cryptographicHash])
+  @@index([createdAt])
+  @@map("hud_append_ledger")
+}
+
+// =====================================================
+// EXISTING FLUXFORGE TABLES (Preserved)
+// =====================================================
+
+model Project {
+  id            String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  organizationId String  @map("organization_id") @db.Uuid
+  name          String   @db.VarChar(255)
+  slug          String   @db.VarChar(255)
+  description   String?
+  status        String   @default("draft") @db.VarChar(50)
+  config        Json     @default("{}")
+  aiSettings    Json     @default("{}") @map("ai_settings")
+  deploymentUrl String?  @map("deployment_url")
+  metadata      Json     @default("{}")
+  createdBy     String?  @map("created_by") @db.Uuid
+  createdAt     DateTime @default(now()) @map("created_at") @db.Timestamptz
+  updatedAt     DateTime @updatedAt @map("updated_at") @db.Timestamptz
+
+  // Relations
+  organization Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  creator      User?        @relation(fields: [createdBy], references: [id])
+  aiAgents     AiAgent[]
+
+  @@unique([organizationId, slug])
+  @@index([organizationId])
+  @@index([status])
+  @@map("projects")
+}
+
+model AiAgent {
+  id             String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  projectId      String   @map("project_id") @db.Uuid
+  name           String   @db.VarChar(255)
+  agentType      String   @map("agent_type") @db.VarChar(100)
+  config         Json     @default("{}")
+  promptTemplate String?  @map("prompt_template")
+  guardrails     Json     @default("[]")
+  isActive       Boolean  @default(true) @map("is_active")
+  metadata       Json     @default("{}")
+  createdAt      DateTime @default(now()) @map("created_at") @db.Timestamptz
+  updatedAt      DateTime @updatedAt @map("updated_at") @db.Timestamptz
+
+  // Relations
+  project Project @relation(fields: [projectId], references: [id], onDelete: Cascade)
+
+  @@index([projectId])
+  @@map("ai_agents")
+}
+
+model Transaction {
+  id                    String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  organizationId        String   @map("organization_id") @db.Uuid
+  subscriptionId        String?  @map("subscription_id") @db.Uuid
+  stripePaymentIntentId String?  @map("stripe_payment_intent_id") @db.VarChar(255)
+  amountCents           Int      @map("amount_cents")
+  currency              String   @default("USD") @db.VarChar(3)
+  status                String   @default("pending") @db.VarChar(50)
+  description           String?
+  metadata              Json     @default("{}")
+  createdAt             DateTime @default(now()) @map("created_at") @db.Timestamptz
+  updatedAt             DateTime @updatedAt @map("updated_at") @db.Timestamptz
+
+  // Relations
+  organization Organization  @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  subscription Subscription? @relation(fields: [subscriptionId], references: [id])
+
+  @@index([organizationId])
+  @@map("transactions")
+}
+
+model AuditLog {
+  id             String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  userId         String?  @map("user_id") @db.Uuid
+  organizationId String?  @map("organization_id") @db.Uuid
+  action         String   @db.VarChar(255)
+  resourceType   String?  @map("resource_type") @db.VarChar(100)
+  resourceId     String?  @map("resource_id") @db.Uuid
+  ipAddress      String?  @map("ip_address") @db.Inet
+  userAgent      String?  @map("user_agent")
+  metadata       Json     @default("{}")
+  createdAt      DateTime @default(now()) @map("created_at") @db.Timestamptz
+
+  // Relations
+  user         User?         @relation(fields: [userId], references: [id])
+  organization Organization? @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+
+  @@index([organizationId])
+  @@index([userId])
+  @@index([createdAt])
+  @@map("audit_logs")
+}
+
+model ApiKey {
+  id             String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  organizationId String    @map("organization_id") @db.Uuid
+  name           String    @db.VarChar(255)
+  keyHash        String    @unique @map("key_hash")
+  keyPrefix      String    @map("key_prefix") @db.VarChar(20)
+  permissions    Json      @default("[]")
+  lastUsedAt     DateTime? @map("last_used_at") @db.Timestamptz
+  expiresAt      DateTime? @map("expires_at") @db.Timestamptz
+  createdBy      String?   @map("created_by") @db.Uuid
+  createdAt      DateTime  @default(now()) @map("created_at") @db.Timestamptz
+  revokedAt      DateTime? @map("revoked_at") @db.Timestamptz
+
+  // Relations
+  organization Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  creator      User?        @relation(fields: [createdBy], references: [id])
+
+  @@index([organizationId])
+  @@index([keyHash])
+  @@map("api_keys")
+}

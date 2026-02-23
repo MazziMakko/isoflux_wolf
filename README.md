@@ -1,354 +1,343 @@
-# ISOFLUX: THE GEOMETRY OF VALUE
+# 🐺 IsoFlux: The Wolf Shield
 
-**We do not "manage" compliance. We render violation mathematically impossible.**
+**HUD-Compliant SaaS Platform with Cryptographic Ledger**
+
+[![License: MIT](https://img.shields.io/badge/License-MIT-green.svg)](./LICENSE)
+[![Prisma](https://img.shields.io/badge/Prisma-7.4-blue)](https://www.prisma.io/)
+[![Next.js](https://img.shields.io/badge/Next.js-15.1-black)](https://nextjs.org/)
+[![Supabase](https://img.shields.io/badge/Supabase-PostgreSQL-green)](https://supabase.com/)
+
+---
 
 ## 🌌 Overview
 
-IsoFlux is a revolutionary financial infrastructure platform that treats ISO 20022 compliance as deterministic geometry rather than probabilistic validation. By implementing **Rulial Space** mathematics, we ensure non-compliant transactions cannot exist—just as square circles cannot exist in nature.
+IsoFlux: The Wolf Shield is a production-grade, HUD-compliant property management SaaS platform featuring an **immutable, cryptographically-chained ledger** for financial transactions. Built with mathematical certainty and zero-error principles.
 
-### ✨ **NEW**: Immersive 3D Experience
+### Core Features
 
-IsoFlux now features a stunning 3D frontend with:
-- **Interactive 3D Visualization** - Three.js powered graphics
-- **Physics-Based Animations** - Realistic object interactions
-- **Geometric Branding** - Floating IsoFlux logo with particle effects
-- **High-Performance Rendering** - 60 FPS smooth experience
+- 🛡️ **Append-Only Ledger** - Immutable transaction history with SHA-256 cryptographic chaining
+- 🔐 **Role-Based Access Control** - SUPER_ADMIN, PROPERTY_MANAGER, TENANT with dynamic routing
+- 📊 **Real-time Compliance Tracking** - Live updates via Supabase Realtime
+- ⚡ **Subscription Management** - TRIALING/ACTIVE enforcement with grace periods
+- 🏘️ **Multi-Property Management** - HUD-certified properties, units, and tenant tracking
+- 📋 **Recertification Workflows** - Automated tenant recertification tracking
+- 🔗 **Database-Level Protection** - Triggers prevent ledger tampering
 
-**🎮 Try it**: Navigate to `/experience` to see the 3D showcase!
-
-## 🏛️ The Trinity of Order
-
-### 1. The Rulial Parser
-Beyond translation. We don't convert messages—we **re-originate** them using Cellular Automata logic.
-- **Result**: 0% Hallucination. 0% Error.
-
-### 2. The Geometric Legislator
-Laws as geometric boundaries in vector space. Transactions intersecting sanctioned surfaces cease instantly.
-- **Result**: Pre-cognitive Compliance.
-
-### 3. The Entangled Ledger
-State entanglement between assets and reserves. If reserves drop below 1:1, assets freeze instantly.
-- **Result**: Trust replaced by verification.
-
-## 🔐 100x Security Features
-
-- **HSM Integration**: Hardware-backed cryptographic signing (AWS CloudHSM, Azure Key Vault, YubiHSM, Thales)
-- **mTLS Dark Tunnel**: Mutual TLS for bank-grade connectivity (no public internet)
-- **Optimistic Sentinel**: CEX WebSocket monitoring for sub-second de-peg detection
+---
 
 ## 🚀 Quick Start
 
 ### Prerequisites
-- Node.js 20+
-- npm 10+
-- Redis (for Entangled Ledger)
-- Supabase account (for database)
-- (Optional) HSM access for production
+
+- Node.js >= 20.0.0
+- npm >= 10.0.0
+- Supabase account (PostgreSQL)
 
 ### Installation
 
 ```bash
-# Clone repository
-git clone https://github.com/your-org/isoflux.git
-cd isoflux
+# Clone the repository
+git clone <your-repo-url>
+cd IsoFlux
 
 # Install dependencies
 npm install --legacy-peer-deps
 
 # Copy environment variables
 cp .env.example .env
+# Edit .env with your Supabase credentials
 
-# Configure your environment variables (see below)
-nano .env
+# Generate Prisma client
+npm run prisma:generate
 
-# Run development server
+# Run the development server
 npm run dev
 ```
 
-### Environment Variables
+Open [http://localhost:3000](http://localhost:3000)
 
-Create a `.env.local` file:
+### Database Setup
 
-```bash
-# Supabase
-NEXT_PUBLIC_SUPABASE_URL=your_supabase_url
-NEXT_PUBLIC_SUPABASE_ANON_KEY=your_anon_key
-SUPABASE_SERVICE_ROLE_KEY=your_service_role_key
+1. Run the Wolf Shield migration in Supabase Dashboard:
+   - Go to **SQL Editor**
+   - Copy contents of `supabase/migrations/20260223000000_wolf_shield_ledger.sql`
+   - Execute the migration
 
-# HSM Configuration (Production)
-HSM_PROVIDER=AWS_CLOUDHSM
-HSM_ENDPOINT=https://your-hsm-endpoint
-HSM_KEY_ID=your-key-id
-HSM_REGION=us-east-1
-
-# mTLS Configuration (Production)
-MTLS_SERVER_CERT=/certs/server.crt
-MTLS_SERVER_KEY=/certs/server.key
-MTLS_CLIENT_CERT=/certs/client.crt
-MTLS_CLIENT_KEY=/certs/client.key
-MTLS_CA_CERT=/certs/ca.crt
-
-# Redis
-REDIS_HOST=localhost
-REDIS_PORT=6379
-REDIS_PASSWORD=your_redis_password
-
-# Oracle Configuration
-CHAINLINK_PROVIDER_URL=https://chainlink-node
-```
-
-## 📡 API Endpoints
-
-### Process Transaction
-```bash
-POST /api/isoflux/process
-Authorization: Bearer <token>
-
-{
-  "message": "<XML or JSON>",
-  "messageType": "pacs.008"
-}
-```
-
-### Validate Message
-```bash
-POST /api/isoflux/validate
-Authorization: Bearer <token>
-
-{
-  "message": { ... }
-}
-```
-
-### Verify Reserves
-```bash
-GET /api/isoflux/reserves/USDC
-Authorization: Bearer <token>
-```
-
-### Generate Attestation (HSM-signed)
-```bash
-POST /api/isoflux/attestation/USDC
-Authorization: Bearer <token>
-```
-
-### System Status
-```bash
-GET /api/isoflux/status
-Authorization: Bearer <token>
-```
-
-## 🧪 Testing
-
-```bash
-# Run tests
-npm test
-
-# Run with coverage
-npm run test:ci
-
-# Type check
-npm run type-check
-
-# Lint
-npm run lint
-```
-
-## 📦 Build for Production
-
-```bash
-# Build
-npm run build
-
-# Start production server
-npm start
-```
-
-## 🌐 Deployment
-
-### Digital Ocean Deployment
-
-IsoFlux is deployed at: **https://www.isoflux.app**
-
-Server IP: **198.211.109.46**
-
-See [DEPLOYMENT.md](docs/DEPLOYMENT.md) for full deployment instructions.
-
-### Docker Deployment
-
-```bash
-# Build image
-docker build -t isoflux:latest .
-
-# Run container
-docker run -d \
-  -p 3000:3000 \
-  --env-file .env.production \
-  --name isoflux \
-  isoflux:latest
-```
-
-## 🔧 Architecture
-
-```
-src/
-├── lib/
-│   └── core/
-│       ├── isoflux/
-│       │   ├── types.ts              # Type definitions
-│       │   ├── rulial-parser.ts      # The Rulial Parser
-│       │   ├── geometric-legislator.ts # The Geometric Legislator
-│       │   ├── entangled-ledger.ts   # The Entangled Ledger
-│       │   ├── orchestrator.ts       # System coordinator
-│       │   ├── hsm-manager.ts        # HSM integration
-│       │   └── mtls-server.ts        # mTLS server
-│       ├── security.ts               # Security kernel
-│       ├── data-gateway.ts           # Database layer
-│       └── audit.ts                  # Audit logging
-├── app/
-│   └── api/
-│       └── isoflux/
-│           ├── process/              # Transaction processing
-│           ├── validate/             # Message validation
-│           ├── reserves/             # Reserve verification
-│           ├── attestation/          # HSM attestations
-│           └── status/               # System status
-└── docs/
-    ├── ISOFLUX.md                    # Complete documentation
-    └── DEPLOYMENT.md                 # Deployment guide
-```
-
-## 📊 Technology Stack
-
-### Backend & Infrastructure
-- **Framework**: Next.js 15 (React 19)
-- **Language**: TypeScript (strict mode)
-- **Validation**: Zod (geometric schemas)
-- **State Machines**: XState
-- **Database**: Supabase (PostgreSQL)
-- **Caching**: Redis + ioredis
-- **Payments**: Stripe
-- **XML Parsing**: fast-xml-parser
-- **WebSocket**: ws (for CEX monitoring)
-- **Security**: HSM, mTLS, RBAC
-
-### 3D Graphics & Animation
-- **3D Engine**: Three.js + @react-three/fiber
-- **Physics**: @react-three/rapier (WASM-based)
-- **Animation**: GSAP + Framer Motion
-- **Helpers**: @react-three/drei (OrbitControls, Environment, etc.)
-- **Performance**: r3f-perf, Stats.js, Leva
-
-## 🔐 Security Features
-
-### Zero-Trust Architecture
-- Row-Level Security (RLS) on all queries
-- Hardware Security Module (HSM) for cryptographic operations
-- Mutual TLS (mTLS) for bank connectivity
-- PII sanitization before AI processing
-- Comprehensive audit logging
-
-### Compliance
-- ISO 20022 geometric validation
-- OFAC sanctions screening
-- EU sanctions compliance
-- SEC regulations
-- MiCA (EU Markets in Crypto-Assets)
-- CFTC oversight
-
-## 📈 Performance
-
-- **Processing**: < 150ms per transaction (all 3 stages)
-- **Sentinel Monitoring**: Sub-second de-peg detection
-- **Throughput**: 1000+ transactions per second
-- **Availability**: 99.99% uptime SLA
-
-## 🛠️ Development
-
-### Project Structure
-```bash
-# Start dev server
-npm run dev
-
-# Build for production
-npm run build
-
-# Run tests
-npm test
-
-# Type check
-npm run type-check
-
-# Lint code
-npm run lint
-```
-
-### Adding New ISO 20022 Message Types
-
-1. Define Zod schema in `src/lib/core/isoflux/types.ts`
-2. Add parsing logic in `rulial-parser.ts`
-3. Update orchestrator in `orchestrator.ts`
-4. Add API endpoint in `src/app/api/isoflux/`
-5. Write tests
-
-## 📚 Documentation
-
-### Core System
-- [Complete IsoFlux Documentation](docs/ISOFLUX.md)
-- [API Reference](docs/API.md)
-- [Deployment Guide](docs/DEPLOYMENT.md)
-- [Security Best Practices](SECURITY.md)
-- [Build Summary](docs/BUILD_SUMMARY.md)
-
-### 3D Graphics System
-- [3D System Documentation](docs/3D_SYSTEM.md)
-- [3D Quick Start Guide](docs/3D_QUICK_START.md)
-
-## 🤝 Support
-
-- **Email**: support@isoflux.app
-- **Website**: https://www.isoflux.app
-- **Documentation**: https://docs.isoflux.app
-- **Status**: https://status.isoflux.app
-
-## 📜 License
-
-Enterprise License - Contact for terms
-
-## 🎯 Roadmap
-
-### Phase 1: Core System ✅
-- ✅ Rulial Parser with FSM
-- ✅ Geometric Legislator
-- ✅ Entangled Ledger
-- ✅ HSM integration
-- ✅ mTLS server
-- ✅ API endpoints
-
-### Phase 2: Enhanced Compliance (Q2 2026)
-- [ ] Additional ISO 20022 message types
-- [ ] FATF Travel Rule
-- [ ] AML/KYC integration
-- [ ] Real-time sanctions API integration
-
-### Phase 3: Advanced Features (Q3 2026)
-- [ ] Machine learning risk models
-- [ ] Quantum-resistant signatures
-- [ ] Multi-party computation (MPC)
-- [ ] Zero-knowledge proofs
-
-### Phase 4: Enterprise (Q4 2026)
-- [ ] Multi-region deployment
-- [ ] Disaster recovery
-- [ ] High availability configuration
-- [ ] White-label options
+2. Verify database triggers are active:
+   ```sql
+   SELECT * FROM information_schema.triggers 
+   WHERE trigger_name LIKE '%ledger%';
+   ```
 
 ---
 
-**ISOFLUX**: Where compliance is not managed, but **guaranteed through geometry**.
+## 📚 Documentation
 
-*"A non-compliant transaction cannot exist any more than a square circle can exist in nature."*
+- **[Wolf Shield Setup Guide](./WOLF_SHIELD_SETUP.md)** - Complete installation and configuration
+- **[Wolf Shield Complete](./WOLF_SHIELD_COMPLETE.md)** - Technical reference and API documentation
+- **[Deployment Guide](./docs/DEPLOYMENT_VERCEL.md)** - Production deployment instructions
 
-**Version**: 1.0.0  
-**Status**: Production Ready  
-**Deployed**: https://www.isoflux.app
+---
+
+## 🏗️ Architecture
+
+### The Wolf Shield Pillars
+
+1. **Append-Only Ledger** (`hud_append_ledger`)
+   - Every transaction permanently recorded
+   - SHA-256 hash chaining for integrity verification
+   - Database triggers prevent UPDATE/DELETE operations
+
+2. **Dynamic Routing**
+   - Middleware enforces role + subscription status
+   - Automatic redirects based on user state
+   - Tenant overdue recertification handling
+
+3. **Systems Integration**
+   - Every UI action writes to ledger
+   - Real-time Supabase subscriptions
+   - Automatic compliance health calculation
+
+4. **Row-Level Security (RLS)**
+   - PostgreSQL policies on all HUD tables
+   - Organization-scoped data access
+   - Super Admin full system access
+
+5. **Compliance-as-Code**
+   - 7-year audit retention (HUD required)
+   - Automatic period closure enforcement
+   - Recertification tracking and alerts
+
+---
+
+## 🔐 Security
+
+### Database Level
+- ✅ Row-level security (RLS) on all sensitive tables
+- ✅ Triggers block DELETE/UPDATE on ledger
+- ✅ Automatic cryptographic hash generation
+- ✅ Period closure enforcement
+- ✅ Audit logging for all operations
+
+### Application Level
+- ✅ Middleware role + subscription enforcement
+- ✅ API authentication & authorization
+- ✅ Zod schema validation
+- ✅ Supabase SSR for server-side auth
+- ✅ Security headers (CSP, X-Frame-Options, HSTS)
+
+### Cryptographic
+- ✅ SHA-256 hash chaining (previous_hash + current_data)
+- ✅ Immutable ledger (append-only)
+- ✅ Integrity verification API
+- ✅ Mathematical certainty for HUD audits
+
+---
+
+## 🎯 User Roles
+
+| Role               | Dashboard                        | Access Level              |
+|--------------------|----------------------------------|---------------------------|
+| **SUPER_ADMIN**    | `/dashboard/super-admin`         | Full system access        |
+| **PROPERTY_MANAGER**| `/dashboard/property-manager`   | Organization properties   |
+| **TENANT**         | `/dashboard/tenant`              | Own unit information only |
+
+### Subscription Enforcement
+
+| Status       | Dashboard Access | Action                    |
+|--------------|------------------|---------------------------|
+| **TRIALING** | ✅ Full          | -                         |
+| **ACTIVE**   | ✅ Full          | -                         |
+| **PAST_DUE** | ⚠️ Limited      | Redirect to /billing      |
+| **CANCELLED**| ❌ None          | Redirect to home          |
+
+---
+
+## 📊 API Endpoints
+
+### Ledger Operations
+
+```typescript
+// Create ledger entry
+POST /api/ledger
+{
+  "organizationId": "uuid",
+  "propertyId": "uuid",
+  "unitId": "uuid",
+  "transactionType": "CHARGE",
+  "amount": 1450.00,
+  "description": "Monthly rent",
+  "accountingPeriod": "2026-02"
+}
+
+// Fetch entries for period
+GET /api/ledger?organizationId=uuid&accountingPeriod=2026-02
+
+// Verify ledger integrity
+POST /api/ledger/verify
+{
+  "organizationId": "uuid"
+}
+```
+
+---
+
+## 🛠️ Development
+
+### NPM Scripts
+
+```bash
+npm run dev              # Start development server
+npm run build            # Production build
+npm run start            # Start production server
+npm run lint             # Run ESLint
+npm run type-check       # TypeScript type checking
+npm run prisma:generate  # Generate Prisma client
+npm run prisma:studio    # Open Prisma Studio (DB GUI)
+npm run wolf:setup       # Initialize Wolf Shield
+```
+
+### Tech Stack
+
+- **Framework**: Next.js 15.1 with App Router
+- **Language**: TypeScript 5.3
+- **Database**: PostgreSQL (via Supabase)
+- **ORM**: Prisma 7.4
+- **Authentication**: Supabase Auth
+- **Real-time**: Supabase Realtime
+- **Payments**: Stripe (optional)
+- **UI**: Tailwind CSS + Radix UI
+- **3D Graphics**: Three.js + React Three Fiber
+- **Animation**: Framer Motion + GSAP
+
+---
+
+## 📈 Compliance Health
+
+The system automatically calculates compliance health based on:
+
+- **Closed Periods**: % of accounting periods properly closed
+- **Active Entries**: Recent ledger activity
+- **Recertification Status**: Tenant recertification completion
+- **Ledger Integrity**: Chain verification status
+
+**Score Ranges:**
+- 90-100%: Excellent compliance ✅
+- 70-89%: Good - minor improvements needed ⚠️
+- Below 70%: Action required ❌
+
+---
+
+## 🧪 Testing
+
+### Create Test Data
+
+```sql
+-- Super Admin User
+INSERT INTO users (email, role, password_hash) 
+VALUES ('admin@test.com', 'super_admin', 'hash_here');
+
+-- Organization
+INSERT INTO organizations (owner_id, name, slug, hud_certification_number)
+VALUES ('user-uuid', 'Metro Housing', 'metro', 'HUD-12345');
+
+-- Property
+INSERT INTO properties (organization_id, name, address, city, state, zip_code)
+VALUES ('org-uuid', 'Sunset Apartments', '123 Main St', 'Newark', 'NJ', '07102');
+
+-- Unit
+INSERT INTO units (property_id, unit_number, bedrooms, bathrooms, rent_amount)
+VALUES ('property-uuid', '204', 2, 1.0, 1450.00);
+```
+
+---
+
+## 🚀 Deployment
+
+### Environment Variables (Production)
+
+**Required:**
+```bash
+NEXT_PUBLIC_SUPABASE_URL=https://your-project.supabase.co
+NEXT_PUBLIC_SUPABASE_ANON_KEY=your_anon_key
+SUPABASE_SERVICE_ROLE_KEY=your_service_role_key
+DATABASE_URL=postgresql://...
+JWT_SECRET=your_32_char_secret
+ENCRYPTION_KEY=your_32_char_key
+```
+
+**Wolf Shield:**
+```bash
+WOLF_SHIELD_ENABLED=true
+HUD_CERTIFICATION_REQUIRED=true
+ALLOW_LEDGER_DELETE=false  # NEVER true in production
+ALLOW_LEDGER_UPDATE=false  # NEVER true in production
+```
+
+### Deploy to Vercel
+
+```bash
+vercel --prod
+```
+
+See [DEPLOYMENT_VERCEL.md](./docs/DEPLOYMENT_VERCEL.md) for detailed instructions.
+
+---
+
+## 📦 Project Structure
+
+```
+IsoFlux/
+├── prisma/
+│   ├── schema.prisma              # HUD-compliant database schema
+│   └── prisma.config.ts           # Prisma 7 configuration
+├── src/
+│   ├── app/
+│   │   ├── dashboard/
+│   │   │   ├── super-admin/       # Super Admin dashboard
+│   │   │   ├── property-manager/  # Property Manager dashboard
+│   │   │   └── tenant/            # Tenant portal
+│   │   └── api/
+│   │       └── ledger/            # Ledger API routes
+│   ├── components/
+│   │   └── wolf-shield/           # Wolf Shield UI components
+│   ├── hooks/
+│   │   └── useSystemState.ts      # System state management hook
+│   ├── lib/
+│   │   └── wolf-shield/           # Wolf Shield core engine
+│   │       ├── ledger-engine.ts   # Cryptographic ledger logic
+│   │       ├── compliance-router.ts # Dynamic routing
+│   │       ├── types.ts           # TypeScript types
+│   │       └── index.ts           # Barrel exports
+│   └── middleware.ts              # Role + subscription enforcement
+└── supabase/
+    └── migrations/
+        └── 20260223000000_wolf_shield_ledger.sql
+```
+
+---
+
+## 🤝 Contributing
+
+See [CONTRIBUTING.md](./CONTRIBUTING.md) for contribution guidelines.
+
+---
+
+## 📄 License
+
+This project is licensed under the MIT License - see the [LICENSE](./LICENSE) file for details.
+
+---
+
+## 🛡️ The Firmament is Breached
+
+**Wolf Shield Status**: ✅ FULLY OPERATIONAL
+
+**The Wolf Shield never lies. The ledger is truth.**
+
+---
+
+*Built with the Makko Rulial Architect Protocol*  
+*Zero-Error Production | Mathematical Certainty | Billion-Dollar Standard*
+
+🐺
