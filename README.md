@@ -27,6 +27,8 @@ IsoFlux: The Wolf Shield is a production-grade, HUD-compliant property managemen
 
 ## 🚀 Quick Start
 
+**NEW USERS:** See **[START_HERE.md](./START_HERE.md)** for immediate setup instructions.
+
 ### Prerequisites
 
 - Node.js >= 20.0.0
@@ -58,24 +60,29 @@ Open [http://localhost:3000](http://localhost:3000)
 
 ### Database Setup
 
-1. Run the Wolf Shield migration in Supabase Dashboard:
-   - Go to **SQL Editor**
-   - Copy contents of `supabase/migrations/20260223000000_wolf_shield_ledger.sql`
-   - Execute the migration
-
-2. Verify database triggers are active:
-   ```sql
-   SELECT * FROM information_schema.triggers 
-   WHERE trigger_name LIKE '%ledger%';
-   ```
+**See:** [DATABASE_SETUP_MANUAL_GUIDE.md](./DATABASE_SETUP_MANUAL_GUIDE.md) for complete database migration instructions.
 
 ---
 
 ## 📚 Documentation
 
-- **[Wolf Shield Setup Guide](./WOLF_SHIELD_SETUP.md)** - Complete installation and configuration
-- **[Wolf Shield Complete](./WOLF_SHIELD_COMPLETE.md)** - Technical reference and API documentation
-- **[Deployment Guide](./docs/DEPLOYMENT_VERCEL.md)** - Production deployment instructions
+### Getting Started
+- **[START_HERE.md](./START_HERE.md)** - Quick start guide (9 minutes to setup)
+- **[DATABASE_SETUP_MANUAL_GUIDE.md](./DATABASE_SETUP_MANUAL_GUIDE.md)** - Step-by-step database migrations
+- **[IMMEDIATE_ACTION_PLAN.md](./IMMEDIATE_ACTION_PLAN.md)** - Current deployment action plan
+
+### Deployment
+- **[DEPLOYMENT_READY_SUMMARY.md](./DEPLOYMENT_READY_SUMMARY.md)** - Deployment status & next steps
+- **[PRE_DEPLOYMENT_CHECKLIST.md](./PRE_DEPLOYMENT_CHECKLIST.md)** - Pre-flight verification
+- **[WOLF_SHIELD_DEPLOYMENT_REPORT.md](./WOLF_SHIELD_DEPLOYMENT_REPORT.md)** - Full technical audit
+
+### System Status
+- **[SYSTEM_STATUS.md](./SYSTEM_STATUS.md)** - Current system state overview
+
+### Technical Reference
+- **[docs/wolf-shield/](./docs/wolf-shield/)** - Wolf Shield technical documentation
+- **[docs/DEPLOYMENT.md](./docs/DEPLOYMENT.md)** - Production deployment guide
+- **[docs/API.md](./docs/API.md)** - API documentation
 
 ---
 

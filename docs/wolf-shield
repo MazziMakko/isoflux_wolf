@@ -65,10 +65,10 @@ Fill in your `.env` file:
 
 ```bash
 # Required
-NEXT_PUBLIC_SUPABASE_URL=https://your-project.supabase.co
-NEXT_PUBLIC_SUPABASE_ANON_KEY=your_anon_key
-SUPABASE_SERVICE_ROLE_KEY=your_service_role_key
-DATABASE_URL=postgresql://postgres:password@db.your-project.supabase.co:5432/postgres
+NEXT_PUBLIC_SUPABASE_URL=https://qmctxtmmzeutlgegjrnb.supabase.co
+NEXT_PUBLIC_SUPABASE_ANON_KEY=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InFtY3R4dG1temV1dGxnZWdqcm5iIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Njg3OTYxNzYsImV4cCI6MjA4NDM3MjE3Nn0.IVcqFhmuAcyB17aIlKhrXLk1OMImdy2BO9rG7wk2SH0
+SUPABASE_SERVICE_ROLE_KEY=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InFtY3R4dG1temV1dGxnZWdqcm5iIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc2ODc5NjE3NiwiZXhwIjoyMDg0MzcyMTc2fQ.QQ28BFtmZGSqnw5cQFKCmoP5N_60gqd73M6q-t9dtwI
+DATABASE_URL=postgresql://postgres:JoatWays@856$@db.qmctxtmmzeutlgegjrnb.supabase.co:5432/postgres
 
 # Stripe (if using payments)
 STRIPE_SECRET_KEY=sk_test_your_key
