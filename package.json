@@ -19,7 +19,8 @@
     "prisma:push": "prisma db push",
     "prisma:studio": "prisma studio",
     "wolf:setup": "npm run prisma:generate && echo Wolf Shield Prisma client generated successfully",
-    "wolf:verify": "node -e \"const { createWolfShieldLedger } = require('./src/lib/wolf-shield/ledger-engine.ts'); console.log('Wolf Shield engine loaded successfully');\""
+    "wolf:verify": "node -e \"const { createWolfShieldLedger } = require('./src/lib/wolf-shield/ledger-engine.ts'); console.log('Wolf Shield engine loaded successfully');\"",
+    "vercel-install": "npm install --legacy-peer-deps"
   },
   "dependencies": {
     "@hookform/resolvers": "^3.3.4",
