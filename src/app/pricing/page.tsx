@@ -35,7 +35,7 @@ export default function PricingPage() {
             
             <div className="mb-8 text-center">
               <div className="mb-2 text-6xl font-bold text-white">
-                $300<span className="text-2xl text-slate-400">/month</span>
+                $299<span className="text-2xl text-slate-400">/month</span>
               </div>
               <p className="text-slate-400">Flat fee • Unlimited units • Unlimited users</p>
             </div>
@@ -123,7 +123,7 @@ export default function PricingPage() {
                   <th className="pb-4 pr-4 text-slate-400"></th>
                   <th className="pb-4 px-4 text-center text-white">
                     <div className="text-lg font-bold">Wolf Shield</div>
-                    <div className="text-sm font-normal text-emerald-400">$300/mo</div>
+                    <div className="text-sm font-normal text-emerald-400">$299/mo</div>
                   </th>
                   <th className="pb-4 px-4 text-center text-slate-400">
                     <div className="text-lg">Legacy Software</div>
@@ -139,7 +139,7 @@ export default function PricingPage() {
                 </tr>
                 <tr>
                   <td className="py-4 pr-4 text-slate-300">Cost for 100 units</td>
-                  <td className="py-4 px-4 text-center text-emerald-400 font-bold">$300/mo</td>
+                  <td className="py-4 px-4 text-center text-emerald-400 font-bold">$299/mo</td>
                   <td className="py-4 px-4 text-center text-slate-400">$800-1,500/mo</td>
                 </tr>
                 <tr>
@@ -184,7 +184,7 @@ export default function PricingPage() {
                 What if I manage 500 units?
               </h3>
               <p className="text-slate-300">
-                Still $300/month. We don't believe in per-unit pricing. You pay the same whether you manage 10 units or 10,000 units.
+                Still $299/month. We don't believe in per-unit pricing. You pay the same whether you manage 10 units or 10,000 units.
               </p>
             </Card>
 

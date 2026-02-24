@@ -1,14 +1,14 @@
 /**
  * =====================================================
  * STRIPE CONFIGURATION: WOLF SHIELD HUD-SECURE PRO
- * $300/month flat fee with 30-day trial
+ * $299/month flat fee with 30-day trial
  * =====================================================
  */
 
 // Stripe Product & Price IDs
 // Create these in Stripe Dashboard:
 // Product: "Wolf Shield HUD-Secure Pro"
-// Price: $300/month (price_xxx)
+// Price: $299/month (price_xxx)
 // Trial: 30 days
 
 export const STRIPE_CONFIG = {
@@ -16,11 +16,11 @@ export const STRIPE_CONFIG = {
   PRODUCT_ID: process.env.STRIPE_PRODUCT_WOLF_SHIELD || '',
   
   // Pricing
-  PRICE_ID_MONTHLY: process.env.STRIPE_PRICE_WOLF_SHIELD_MONTHLY || 'price_wolf_shield_300', // $300/mo
+  PRICE_ID_MONTHLY: process.env.STRIPE_PRICE_WOLF_SHIELD_MONTHLY || 'price_wolf_shield_299', // $299/mo
   
   // Features
   TRIAL_PERIOD_DAYS: 30,
-  MONTHLY_PRICE: 300.00,
+  MONTHLY_PRICE: 299.00,
   CURRENCY: 'usd',
   
   // Billing

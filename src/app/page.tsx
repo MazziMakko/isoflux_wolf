@@ -43,7 +43,7 @@ export default function HomePage() {
           </div>
           
           <p className="mt-4 text-sm text-slate-400">
-            No credit card required • Cancel anytime • $300/month flat fee
+            No credit card required • Cancel anytime • $299/month flat fee
           </p>
         </div>
       </section>
@@ -91,7 +91,7 @@ export default function HomePage() {
                 </li>
                 <li className="flex items-start gap-2">
                   <span className="mt-1 text-emerald-400">✓</span>
-                  <span><strong>Flat $300/mo:</strong> Unlimited units, unlimited users</span>
+                  <span><strong>Flat $299/mo:</strong> Unlimited units, unlimited users</span>
                 </li>
                 <li className="flex items-start gap-2">
                   <span className="mt-1 text-emerald-400">✓</span>
@@ -153,7 +153,7 @@ export default function HomePage() {
 
             <Card className="border-emerald-500/20 bg-slate-800/50 p-6 backdrop-blur">
               <div className="mb-4 text-4xl">💰</div>
-              <h3 className="mb-3 text-xl font-bold text-emerald-400">Flat $300/Month</h3>
+              <h3 className="mb-3 text-xl font-bold text-emerald-400">Flat $299/Month</h3>
               <p className="text-slate-300">
                 No per-unit fees. Manage 10 units or 1,000 units—same price. 30-day free trial. No contracts. Cancel anytime.
               </p>
