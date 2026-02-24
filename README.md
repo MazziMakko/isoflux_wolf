@@ -2,6 +2,8 @@
 
 **HUD-Compliant SaaS Platform with Cryptographic Ledger**
 
+**Production Status:** ✅ Ready | **Pricing:** $299/month
+
 [![License: MIT](https://img.shields.io/badge/License-MIT-green.svg)](./LICENSE)
 [![Prisma](https://img.shields.io/badge/Prisma-7.4-blue)](https://www.prisma.io/)
 [![Next.js](https://img.shields.io/badge/Next.js-15.1-black)](https://nextjs.org/)
