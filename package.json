@@ -1,8 +1,8 @@
 {
-  "name": "fluxforge-ai",
+  "name": "wolf-shield",
   "version": "1.0.0",
   "private": true,
-  "description": "Enterprise SaaS Builder with Agentic AI - Production Ready Platform",
+  "description": "Wolf Shield - HUD-Compliant Property Management SaaS by New Jerusalem Holdings, LLC",
   "scripts": {
     "dev": "next dev",
     "build": "next build",

@@ -72,7 +72,7 @@ export async function POST(req: NextRequest) {
         id: userId,
         email: validated.email,
         full_name: validated.fullName,
-        role: 'customer',
+        role: 'property_manager', // Default role for signups
         password_hash: 'managed_by_supabase_auth',
         email_verified: true,
       },
@@ -80,8 +80,11 @@ export async function POST(req: NextRequest) {
     );
 
     if (!userProfile) {
-      console.error('[Signup] Profile sync failed (user created in Auth but not DB)');
-      // Continue so we can complete org/member/sub; profile can be retried or fixed manually.
+      console.error('[Signup] Profile sync failed - this is critical');
+      return NextResponse.json(
+        { error: 'Failed to create user profile. Please try again.' },
+        { status: 500 }
+      );
     }
 
     // 3. Create Organization
@@ -153,7 +156,7 @@ export async function POST(req: NextRequest) {
     );
 
     if (token) {
-      response.cookies.set('fluxforge_token', token, {
+      response.cookies.set('wolf_shield_token', token, {
         httpOnly: true,
         secure: process.env.NODE_ENV === 'production',
         sameSite: 'lax',

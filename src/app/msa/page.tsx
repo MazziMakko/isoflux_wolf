@@ -28,8 +28,8 @@ export default function MSAPage() {
               <h2 className="mb-4 text-2xl font-bold text-white">1. Agreement Overview</h2>
               <p>
                 This Master Subscription Agreement ("Agreement") is entered into between{' '}
-                <strong className="text-emerald-400">New Jerusalem Sovereign Holdings, LLC</strong>{' '}
-                ("Provider," "we," "us," or "our") and the subscribing entity ("Customer," "you," or "your").
+                <strong className="text-emerald-400">New Jerusalem Holdings, LLC</strong>{' '}
+                ("Provider," "we," "us," or "our"), a Wyoming limited liability company, and the subscribing entity ("Customer," "you," or "your").
               </p>
               <p className="mt-4">
                 By subscribing to Wolf Shield HUD-Secure Pro ("the Service"), you acknowledge that you have read,
@@ -47,7 +47,7 @@ export default function MSAPage() {
                   <strong>Wolf Shield is a software utility designed to assist with data management.</strong>
                 </p>
                 <p className="mt-4">
-                  New Jerusalem Sovereign Holdings, LLC is <strong className="text-yellow-400">NOT</strong>:
+                  New Jerusalem Holdings, LLC is <strong className="text-yellow-400">NOT</strong>:
                 </p>
                 <ul className="mt-2 list-inside list-disc space-y-1">
                   <li>A legal advisor</li>

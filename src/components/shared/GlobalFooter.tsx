@@ -16,7 +16,10 @@ export function GlobalFooter() {
           <div className="col-span-1">
             <h3 className="mb-4 text-xl font-bold text-emerald-400">🐺 Wolf Shield</h3>
             <p className="text-sm text-slate-400">
-              HUD-Secure Pro by New Jerusalem Sovereign Holdings, LLC
+              HUD-Secure Pro by New Jerusalem Holdings, LLC
+            </p>
+            <p className="mt-2 text-xs text-slate-500">
+              Wyoming, USA
             </p>
             <p className="mt-4 text-xs text-slate-500">© 2026 All rights reserved.</p>
           </div>
@@ -53,24 +56,19 @@ export function GlobalFooter() {
             <h4 className="mb-4 text-sm font-semibold uppercase text-slate-300">Support</h4>
             <ul className="space-y-2 text-sm text-slate-400">
               <li>
-                <a href="mailto:support@wolfshield.app" className="hover:text-emerald-400">
-                  support@wolfshield.app
+                <a href="mailto:support@isoflux.app" className="hover:text-emerald-400">
+                  support@isoflux.app
+                </a>
+              </li>
+              <li>
+                <a href="tel:+18562748668" className="hover:text-emerald-400">
+                  (856) 274-8668
                 </a>
               </li>
               <li>
                 <Link href="/contact" className="hover:text-emerald-400">
                   Contact Us
                 </Link>
-              </li>
-              <li>
-                <a
-                  href="https://docs.wolfshield.app"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="hover:text-emerald-400"
-                >
-                  Documentation
-                </a>
               </li>
             </ul>
           </div>
@@ -107,12 +105,12 @@ export function GlobalFooter() {
         <div className="mt-12 border-t border-slate-800 pt-8">
           <div className="flex flex-col items-center justify-between gap-4 text-xs text-slate-500 sm:flex-row">
             <p>
-              Wolf Shield™ is a trademark of New Jerusalem Sovereign Holdings, LLC. All intellectual property rights
+              Wolf Shield™ is a trademark of New Jerusalem Holdings, LLC. All intellectual property rights
               reserved.
             </p>
             <p>
-              <a href="mailto:legal@wolfshield.app" className="hover:text-emerald-400">
-                legal@wolfshield.app
+              <a href="mailto:support@isoflux.app" className="hover:text-emerald-400">
+                support@isoflux.app
               </a>
             </p>
           </div>
