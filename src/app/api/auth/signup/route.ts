@@ -72,7 +72,7 @@ export async function POST(req: NextRequest) {
         id: userId,
         email: validated.email,
         full_name: validated.fullName,
-        role: 'PROPERTY_MANAGER', // Use uppercase enum value
+        role: 'property_manager', // Use lowercase with underscore to match enum
         password_hash: 'managed_by_supabase_auth',
         email_verified: true,
       },
@@ -81,8 +81,10 @@ export async function POST(req: NextRequest) {
 
     if (!userProfile) {
       console.error('[Signup] Profile sync failed - this is critical');
+      // Log the actual error for debugging
+      console.error('[Signup] DataGateway lastError:', dataGateway.lastError);
       return NextResponse.json(
-        { error: 'Failed to create user profile. Please try again.' },
+        { error: 'Failed to create user profile. Please contact support.' },
         { status: 500 }
       );
     }
@@ -118,7 +120,7 @@ export async function POST(req: NextRequest) {
     await dataGateway.create('subscriptions', {
       organization_id: organization.id,
       tier: 'free',
-      status: 'TRIALING',
+      status: 'trialing', // Use lowercase to match enum
       metadata: {},
     });
 

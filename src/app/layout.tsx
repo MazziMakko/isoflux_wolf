@@ -11,7 +11,7 @@ export const metadata: Metadata = {
   keywords: 'ISO 20022, Clarity Act, GENIUS Act, compliance reactor, fintech, compliance automation',
   authors: [{ name: 'IsoFlux' }],
   openGraph: {
-    title: 'IsoFlux (The Compliance Wolf) | Compliance in Milliseconds',
+    title: 'Wolf Shield | HUD-Compliant Property Management Software',
     description: 'The world\'s first compliance reactor. ISO 20022, Clarity Act, GENIUS Act—automated.',
     type: 'website',
   },
