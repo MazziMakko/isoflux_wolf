@@ -63,18 +63,21 @@ export default function LoginPage() {
       <div className="max-w-md w-full">
         <div className="text-center mb-8">
           <Link href="/" className="inline-flex items-center space-x-2 mb-6">
-            <Zap className="h-10 w-10 text-primary-600" />
-            <span className="text-3xl font-bold gradient-text">IsoFlux (The Compliance Wolf)</span>
+            <span className="text-4xl">🐺</span>
+            <span className="text-3xl font-bold text-emerald-400">Wolf Shield</span>
           </Link>
-          <h1 className="text-3xl font-bold mb-2">Welcome back</h1>
-          <p className="text-gray-600">Sign in to your account to continue</p>
+          <h1 className="text-3xl font-bold mb-2">Welcome Back</h1>
+          <p className="text-gray-600">Sign in to manage your properties</p>
         </div>
 
         <div className="glass-card p-8">
           <form onSubmit={handleSubmit} className="space-y-6">
             {error && (
               <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg">
-                {error}
+                <strong>Login failed.</strong> {error}
+                <p className="text-sm mt-1">
+                  Need help? Text/Call: <a href="tel:+18562748668" className="underline text-red-700">(856) 274-8668</a>
+                </p>
               </div>
             )}
 
