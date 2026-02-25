@@ -62,35 +62,38 @@ export default function SignupPage() {
   };
 
   return (
-    <div className="min-h-screen section-gradient flex items-center justify-center px-4">
+    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 flex items-center justify-center px-4">
       <div className="max-w-md w-full">
         <div className="text-center mb-8">
           <Link href="/" className="inline-flex items-center space-x-2 mb-6">
-            <Zap className="h-10 w-10 text-primary-600" />
-            <span className="text-3xl font-bold gradient-text">FluxForge AI</span>
+            <span className="text-4xl">🐺</span>
+            <span className="text-3xl font-bold text-emerald-400">Wolf Shield</span>
           </Link>
-          <h1 className="text-3xl font-bold mb-2">Create your account</h1>
-          <p className="text-gray-600">Start building production-ready SaaS today</p>
+          <h1 className="text-3xl font-bold text-white mb-2">Start Your Free Trial</h1>
+          <p className="text-slate-300">
+            Join property managers who automated their HUD compliance in minutes
+          </p>
         </div>
 
-        <div className="glass-card p-8">
+        <div className="glass-card p-8 border border-slate-700 bg-slate-800/50 backdrop-blur">
           <form onSubmit={handleSubmit} className="space-y-6">
             {error && (
-              <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg">
-                {error}
+              <div className="bg-red-900/30 border border-red-500 text-red-200 px-4 py-3 rounded-lg">
+                <strong>Oops!</strong> {error}
+                <p className="text-sm mt-1">Need help? Email: support@isoflux.app</p>
               </div>
             )}
 
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                Full Name
+              <label className="block text-sm font-medium text-slate-300 mb-2">
+                Your Name
               </label>
               <div className="relative">
-                <User className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-gray-400" />
+                <User className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-slate-400" />
                 <input
                   type="text"
                   required
-                  className="input-field pl-10"
+                  className="w-full pl-10 pr-4 py-3 bg-slate-900/50 border border-slate-600 rounded-lg text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-emerald-500"
                   placeholder="John Doe"
                   value={formData.fullName}
                   onChange={(e) => setFormData({ ...formData, fullName: e.target.value })}
@@ -99,16 +102,16 @@ export default function SignupPage() {
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                Email
+              <label className="block text-sm font-medium text-slate-300 mb-2">
+                Email Address
               </label>
               <div className="relative">
-                <Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-gray-400" />
+                <Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-slate-400" />
                 <input
                   type="email"
                   required
-                  className="input-field pl-10"
-                  placeholder="you@company.com"
+                  className="w-full pl-10 pr-4 py-3 bg-slate-900/50 border border-slate-600 rounded-lg text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-emerald-500"
+                  placeholder="you@yourproperty.com"
                   value={formData.email}
                   onChange={(e) => setFormData({ ...formData, email: e.target.value })}
                 />
@@ -116,34 +119,34 @@ export default function SignupPage() {
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
+              <label className="block text-sm font-medium text-slate-300 mb-2">
                 Password
               </label>
               <div className="relative">
-                <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-gray-400" />
+                <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-slate-400" />
                 <input
                   type="password"
                   required
                   minLength={8}
-                  className="input-field pl-10"
+                  className="w-full pl-10 pr-4 py-3 bg-slate-900/50 border border-slate-600 rounded-lg text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-emerald-500"
                   placeholder="••••••••"
                   value={formData.password}
                   onChange={(e) => setFormData({ ...formData, password: e.target.value })}
                 />
               </div>
-              <p className="text-xs text-gray-500 mt-1">Minimum 8 characters</p>
+              <p className="text-xs text-slate-400 mt-1">Minimum 8 characters</p>
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                Organization Name (Optional)
+              <label className="block text-sm font-medium text-slate-300 mb-2">
+                Property/Company Name (Optional)
               </label>
               <div className="relative">
-                <Building2 className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-gray-400" />
+                <Building2 className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-slate-400" />
                 <input
                   type="text"
-                  className="input-field pl-10"
-                  placeholder="Acme Inc."
+                  className="w-full pl-10 pr-4 py-3 bg-slate-900/50 border border-slate-600 rounded-lg text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-emerald-500"
+                  placeholder="Oak Street Apartments"
                   value={formData.organizationName}
                   onChange={(e) => setFormData({ ...formData, organizationName: e.target.value })}
                 />
@@ -153,25 +156,25 @@ export default function SignupPage() {
             <button
               type="submit"
               disabled={loading}
-              className="btn-primary w-full"
+              className="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-3 px-6 rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
             >
-              {loading ? 'Creating account...' : 'Create account'}
+              {loading ? 'Creating your account...' : 'Start Free 30-Day Trial'}
             </button>
 
-            <p className="text-center text-sm text-gray-600">
+            <p className="text-center text-sm text-slate-400">
               Already have an account?{' '}
-              <Link href="/login" className="text-primary-600 font-semibold hover:underline">
+              <Link href="/login" className="text-emerald-400 font-semibold hover:underline">
                 Sign in
               </Link>
             </p>
           </form>
         </div>
 
-        <p className="text-center text-xs text-gray-500 mt-6">
+        <p className="text-center text-xs text-slate-500 mt-6">
           By signing up, you agree to our{' '}
-          <Link href="/terms" className="underline">Terms of Service</Link>
+          <Link href="/msa" className="underline hover:text-emerald-400">Master Subscription Agreement</Link>
           {' '}and{' '}
-          <Link href="/privacy" className="underline">Privacy Policy</Link>
+          <Link href="/privacy-policy" className="underline hover:text-emerald-400">Privacy Policy</Link>
         </p>
       </div>
     </div>

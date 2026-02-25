@@ -44,13 +44,14 @@ export async function POST(req: NextRequest) {
     const body = await req.json();
     const validated = signupSchema.parse(body);
 
-    // 1. Create User in Supabase Auth (The Source of Truth)
+    // 1. Create User in Supabase Auth with email verification required
     const { data: authData, error: authError } = await supabaseAdmin.auth.admin.createUser({
       email: validated.email,
       password: validated.password,
-      email_confirm: true,
+      email_confirm: false, // Require email confirmation - Supabase will send verification email
       user_metadata: {
         full_name: validated.fullName,
+        organization_name: validated.organizationName || `${validated.fullName}'s Organization`,
       },
     });
 
@@ -65,7 +66,7 @@ export async function POST(req: NextRequest) {
 
     const userId = authData.user.id;
 
-    // 2. Sync to public.users (placeholder password_hash; Auth holds the real secret)
+    // 2. Sync to public.users (email_verified will be false until they confirm)
     const userProfile = await dataGateway.upsert(
       'users',
       {
@@ -74,7 +75,7 @@ export async function POST(req: NextRequest) {
         full_name: validated.fullName,
         role: 'property_manager', // Default role for signups
         password_hash: 'managed_by_supabase_auth',
-        email_verified: true,
+        email_verified: false, // Will be updated when they confirm email
       },
       { onConflict: 'id' }
     );
@@ -114,56 +115,42 @@ export async function POST(req: NextRequest) {
       permissions: [],
     });
 
-    // 5. Create Subscription
+    // 5. Create Subscription (TRIALING status until email verified)
     await dataGateway.create('subscriptions', {
       organization_id: organization.id,
       tier: 'free',
-      status: 'active',
-      metadata: {},
+      status: 'trialing', // Changed from 'active' - becomes ACTIVE after email verification
+      metadata: { email_verification_pending: true },
     });
 
-    // 6. Sign in to get session token for immediate use
-    const { data: signInData } = await supabaseAdmin.auth.signInWithPassword({
-      email: validated.email,
-      password: validated.password,
-    });
-
+    // 6. Send audit log
     try {
       await auditLogger.logAuthEvent(userId, 'REGISTER', {
         email: validated.email,
         organizationId: organization.id,
+        emailVerificationRequired: true,
       });
     } catch {
       /* non-fatal audit error */
     }
 
-    const session = signInData.session;
-    const token = session?.access_token ?? null;
+    // 7. Return success WITHOUT logging them in
+    // They need to verify email first
     const response = NextResponse.json(
       {
         success: true,
+        emailVerificationRequired: true,
+        message: 'Account created! Please check your email to verify your account.',
         user: {
           id: userId,
           email: validated.email,
           fullName: validated.fullName,
-          full_name: validated.fullName,
+          email_verified: false,
         },
         organization: { id: organization.id, name: organization.name, slug: organization.slug },
-        token,
-        refresh_token: session?.refresh_token ?? undefined,
       },
       { status: 201 }
     );
-
-    if (token) {
-      response.cookies.set('wolf_shield_token', token, {
-        httpOnly: true,
-        secure: process.env.NODE_ENV === 'production',
-        sameSite: 'lax',
-        maxAge: 60 * 60 * 24 * 7,
-        path: '/',
-      });
-    }
 
     return response;
   } catch (error: unknown) {
