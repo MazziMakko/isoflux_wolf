@@ -188,8 +188,8 @@ export default function TermsOfServicePage() {
                 </p>
                 <p className="mt-2">
                   <strong>Email:</strong>{' '}
-                  <a href="mailto:support@isoflux.app" className="text-emerald-400 hover:underline">
-                    support@isoflux.app
+                  <a href="mailto:thenationofmazzi@gmail.com" className="text-emerald-400 hover:underline">
+                    thenationofmazzi@gmail.com
                   </a>
                 </p>
                 <p className="mt-2">

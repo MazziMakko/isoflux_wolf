@@ -56,8 +56,8 @@ export function GlobalFooter() {
             <h4 className="mb-4 text-sm font-semibold uppercase text-slate-300">Support</h4>
             <ul className="space-y-2 text-sm text-slate-400">
               <li>
-                <a href="mailto:support@isoflux.app" className="hover:text-emerald-400">
-                  support@isoflux.app
+                <a href="mailto:thenationofmazzi@gmail.com" className="hover:text-emerald-400">
+                  thenationofmazzi@gmail.com
                 </a>
               </li>
               <li>
@@ -109,8 +109,8 @@ export function GlobalFooter() {
               reserved.
             </p>
             <p>
-              <a href="mailto:support@isoflux.app" className="hover:text-emerald-400">
-                support@isoflux.app
+              <a href="mailto:thenationofmazzi@gmail.com" className="hover:text-emerald-400">
+                thenationofmazzi@gmail.com
               </a>
             </p>
           </div>
