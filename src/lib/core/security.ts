@@ -146,7 +146,7 @@ export class SecurityKernel {
   }
 
   /**
-   * Validate Supabase access token (JWT) via Auth API so API routes work with Bearer/fluxforge_token.
+   * Validate Supabase access token (JWT) via Auth API so API routes work with Bearer/wolf_shield_token.
    */
   private async validateSupabaseAccessToken(accessToken: string): Promise<{ id: string } | null> {
     const url = process.env.NEXT_PUBLIC_SUPABASE_URL;

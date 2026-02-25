@@ -184,7 +184,7 @@ export async function middleware(request: NextRequest) {
 
   // For non-API routes, check basic auth
   if (!isApiRoute && !isPublicRoute) {
-    const token = request.cookies.get('fluxforge_token')?.value;
+    const token = request.cookies.get('wolf_shield_token')?.value;
 
     if (!token) {
       const loginUrl = new URL('/login', request.url);
