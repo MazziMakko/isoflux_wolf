@@ -2,18 +2,22 @@
 
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { createClient } from '@/lib/supabase-browser';
+import { createBrowserClient } from '@supabase/ssr';
 import { Card } from '@/components/ui/AnimatedCard';
 import { Clock, CreditCard, Check, X } from 'lucide-react';
 import { differenceInDays, format } from 'date-fns';
 
 export default function BillingPage() {
   const router = useRouter();
-  const supabase = createClient();
   const [loading, setLoading] = useState(true);
   const [subscription, setSubscription] = useState<any>(null);
   const [organization, setOrganization] = useState<any>(null);
   const [daysRemaining, setDaysRemaining] = useState<number | null>(null);
+
+  const supabase = createBrowserClient(
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+  );
 
   useEffect(() => {
     loadBillingInfo();
@@ -260,8 +264,8 @@ export default function BillingPage() {
           <h3 className="text-lg font-bold text-white mb-2">Need Help?</h3>
           <p className="text-slate-300 text-sm">
             Contact us at{' '}
-            <a href="mailto:support@isoflux.app" className="text-emerald-400 hover:underline">
-              support@isoflux.app
+            <a href="mailto:thenationofmazzi@gmail.com" className="text-emerald-400 hover:underline">
+              thenationofmazzi@gmail.com
             </a>
             {' '}or call{' '}
             <a href="tel:+18562748668" className="text-emerald-400 hover:underline">
