@@ -165,8 +165,8 @@ export default function TermsOfServicePage() {
             <section>
               <h2 className="mb-4 text-2xl font-bold text-white">12. Governing Law</h2>
               <p>
-                These Terms are governed by the laws of the State of Delaware. Disputes shall be resolved through
-                binding arbitration.
+                These Terms are governed by the laws of the State of Wyoming. Disputes shall be resolved through
+                binding arbitration in accordance with the rules of the American Arbitration Association.
               </p>
             </section>
 
@@ -180,11 +180,25 @@ export default function TermsOfServicePage() {
 
             <section>
               <h2 className="mb-4 text-2xl font-bold text-white">14. Contact</h2>
-              <p>
-                For questions about these Terms:
-                <br />
-                <strong className="text-emerald-400">legal@wolfshield.app</strong>
-              </p>
+              <div className="rounded bg-slate-900/50 p-4">
+                <p>
+                  <strong className="text-emerald-400">New Jerusalem Holdings, LLC</strong>
+                  <br />
+                  Wyoming, USA
+                </p>
+                <p className="mt-2">
+                  <strong>Email:</strong>{' '}
+                  <a href="mailto:support@isoflux.app" className="text-emerald-400 hover:underline">
+                    support@isoflux.app
+                  </a>
+                </p>
+                <p className="mt-2">
+                  <strong>Phone:</strong>{' '}
+                  <a href="tel:+18562748668" className="text-emerald-400 hover:underline">
+                    (856) 274-8668
+                  </a>
+                </p>
+              </div>
             </section>
 
             <div className="mt-12 rounded border-2 border-emerald-500/50 bg-emerald-900/20 p-6">
