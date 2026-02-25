@@ -115,12 +115,19 @@ export async function POST(req: NextRequest) {
       permissions: [],
     });
 
-    // 5. Create Subscription (TRIALING status until email verified)
+    // 5. Create Subscription (TRIALING status with 30-day trial)
+    const trialEndDate = new Date();
+    trialEndDate.setDate(trialEndDate.getDate() + 30); // 30 days from now
+    
     await dataGateway.create('subscriptions', {
       organization_id: organization.id,
       tier: 'free',
-      status: 'trialing', // Changed from 'active' - becomes ACTIVE after email verification
-      metadata: { email_verification_pending: true },
+      status: 'trialing', // Changed from 'active' - becomes ACTIVE after email verification OR upgrade
+      trial_end_date: trialEndDate.toISOString(),
+      metadata: { 
+        email_verification_pending: true,
+        trial_started: new Date().toISOString(),
+      },
     });
 
     // 6. Send audit log
