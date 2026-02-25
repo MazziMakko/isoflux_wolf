@@ -167,69 +167,56 @@ async function completeLogin(
     defaultOrg = organization;
   }
 
-    const subscription = await dataGateway.getActiveSubscription(defaultOrg.id);
+  const subscription = await dataGateway.getActiveSubscription(defaultOrg.id);
 
-    // 3. Update last login
-    await dataGateway.update('users', userId, {
-      last_login_at: new Date().toISOString(),
+  // 3. Update last login
+  await dataGateway.update('users', userId, {
+    last_login_at: new Date().toISOString(),
+  });
+
+  const clientIp =
+    req.headers.get('x-forwarded-for')?.split(',')[0]?.trim() ??
+    req.headers.get('x-real-ip') ??
+    'unknown';
+  try {
+    await auditLogger.logAuthEvent(userId, 'LOGIN', {
+      email: user.email,
+      organizationId: defaultOrg.id,
+      ip: clientIp,
     });
-
-    const clientIp =
-      req.headers.get('x-forwarded-for')?.split(',')[0]?.trim() ??
-      req.headers.get('x-real-ip') ??
-      'unknown';
-    try {
-      await auditLogger.logAuthEvent(userId, 'LOGIN', {
-        email: user.email,
-        organizationId: defaultOrg.id,
-        ip: clientIp,
-      });
-    } catch {
-      /* non-fatal */
-    }
-
-    // 4. Return Supabase session tokens; set cookie so middleware allows /dashboard
-    const response = NextResponse.json({
-      success: true,
-      user: {
-        id: user.id,
-        email: user.email,
-        fullName: user.full_name,
-        role: user.role,
-        avatarUrl: user.avatar_url,
-      },
-      organization: {
-        id: defaultOrg.id,
-        name: defaultOrg.name,
-        slug: defaultOrg.slug,
-      },
-      subscription: subscription
-        ? { tier: subscription.tier, status: subscription.status }
-        : null,
-      token: authData.session.access_token,
-      refresh_token: authData.session.refresh_token ?? undefined,
-    });
-
-    response.cookies.set('wolf_shield_token', authData.session.access_token, {
-      httpOnly: true,
-      secure: process.env.NODE_ENV === 'production',
-      sameSite: 'lax',
-      maxAge: 60 * 60 * 24 * 7, // 7 days
-      path: '/',
-    });
-
-    return response;
-  } catch (error: unknown) {
-    if (error instanceof z.ZodError) {
-      return NextResponse.json(
-        { error: 'Validation error', details: error.errors },
-        { status: 400 }
-      );
-    }
-    console.error('Login error:', error);
-    return NextResponse.json(
-      { error: 'Internal server error' },
-      { status: 500 }
-    );
+  } catch {
+    /* non-fatal */
   }
+
+  // 4. Return Supabase session tokens; set cookie so middleware allows /dashboard
+  const response = NextResponse.json({
+    success: true,
+    user: {
+      id: user.id,
+      email: user.email,
+      fullName: user.full_name,
+      role: user.role,
+      avatarUrl: user.avatar_url,
+    },
+    organization: {
+      id: defaultOrg.id,
+      name: defaultOrg.name,
+      slug: defaultOrg.slug,
+    },
+    subscription: subscription
+      ? { tier: subscription.tier, status: subscription.status }
+      : null,
+    token: authData.session.access_token,
+    refresh_token: authData.session.refresh_token ?? undefined,
+  });
+
+  response.cookies.set('wolf_shield_token', authData.session.access_token, {
+    httpOnly: true,
+    secure: process.env.NODE_ENV === 'production',
+    sameSite: 'lax',
+    maxAge: 60 * 60 * 24 * 7, // 7 days
+    path: '/',
+  });
+
+  return response;
 }
