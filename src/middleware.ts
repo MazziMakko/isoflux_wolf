@@ -131,8 +131,8 @@ export async function middleware(request: NextRequest) {
       if (subscription) {
         const subscriptionStatus = subscription.status as SubscriptionStatus;
 
-        // CRITICAL: Only TRIALING or ACTIVE can access dashboard
-        const allowedStatuses: SubscriptionStatus[] = ['TRIALING', 'ACTIVE'];
+        // CRITICAL: Only trialing or active can access dashboard
+        const allowedStatuses: SubscriptionStatus[] = ['trialing', 'active'];
 
         if (!allowedStatuses.includes(subscriptionStatus)) {
           // If PAST_DUE, redirect to billing (unless already there)
@@ -158,7 +158,7 @@ export async function middleware(request: NextRequest) {
     }
 
     // Check for tenant-specific redirects (EULA acceptance)
-    if (userRole === 'TENANT') {
+    if (userRole === 'tenant') {
       // Check if tenant has accepted EULA
       const eulaAccepted = user.user_metadata?.eula_accepted;
       

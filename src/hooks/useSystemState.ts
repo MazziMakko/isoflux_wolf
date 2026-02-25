@@ -159,13 +159,13 @@ export function useSystemState(): UseSystemStateReturn {
 
       // Determine dashboard access
       const canAccessDashboard =
-        subscription?.status === 'ACTIVE' || subscription?.status === 'TRIALING';
+        subscription?.status === 'active' || subscription?.status === 'trialing';
 
       // Build redirect path if needed
       let redirectPath: string | undefined;
       if (subscription?.status === 'PAST_DUE') {
         redirectPath = '/billing';
-      } else if (userData.role === 'TENANT') {
+      } else if (userData.role === 'tenant') {
         // Check recertification status
         const { data: tenantData } = await supabase
           .from('tenants')
@@ -299,5 +299,5 @@ export function useHasRole(requiredRole: UserRole | UserRole[]): boolean {
 
 export function useHasActiveSubscription(): boolean {
   const { subscription } = useSystemState();
-  return subscription?.status === 'ACTIVE' || subscription?.status === 'TRIALING';
+  return subscription?.status === 'active' || subscription?.status === 'trialing';
 }
