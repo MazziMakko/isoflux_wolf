@@ -1,0 +1,13 @@
+User-agent: *
+Allow: /
+Allow: /pricing
+Allow: /msa
+Allow: /privacy-policy
+Allow: /terms-of-service
+Allow: /login
+Allow: /signup
+
+Disallow: /dashboard/
+Disallow: /api/
+
+Sitemap: https://www.isoflux.app/sitemap.xml

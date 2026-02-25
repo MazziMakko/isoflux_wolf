@@ -28,7 +28,7 @@ export default function DashboardPage() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const token = localStorage.getItem('fluxforge_token');
+    const token = localStorage.getItem('wolf_shield_token');
     if (!token) {
       router.push('/login');
       return;
@@ -56,7 +56,7 @@ export default function DashboardPage() {
   }, [router]);
 
   const fetchProjects = async () => {
-    const token = localStorage.getItem('fluxforge_token');
+    const token = localStorage.getItem('wolf_shield_token');
     if (!token) {
       setLoading(false);
       router.push('/login');
@@ -77,9 +77,9 @@ export default function DashboardPage() {
       clearTimeout(timeoutId);
 
       if (response.status === 401) {
-        localStorage.removeItem('fluxforge_token');
-        localStorage.removeItem('fluxforge_user');
-        localStorage.removeItem('fluxforge_org');
+        localStorage.removeItem('wolf_shield_token');
+        localStorage.removeItem('wolf_shield_user');
+        localStorage.removeItem('wolf_shield_org');
         router.push('/login');
         return;
       }

@@ -35,10 +35,10 @@ export default function SignupPage() {
         throw new Error(data.error || 'Signup failed');
       }
 
-      localStorage.setItem('fluxforge_token', data.token);
-      localStorage.setItem('fluxforge_user', JSON.stringify(data.user));
+      localStorage.setItem('wolf_shield_token', data.token);
+      localStorage.setItem('wolf_shield_user', JSON.stringify(data.user));
       if (data.organization) {
-        localStorage.setItem('fluxforge_org', JSON.stringify(data.organization));
+        localStorage.setItem('wolf_shield_org', JSON.stringify(data.organization));
       }
 
       // Set Supabase session in cookies (with 3s timeout so we don't stall)

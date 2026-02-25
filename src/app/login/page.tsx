@@ -34,9 +34,9 @@ export default function LoginPage() {
       }
 
       // Persist for dashboard and API (Bearer token fallback)
-      localStorage.setItem('fluxforge_token', data.token);
-      localStorage.setItem('fluxforge_user', JSON.stringify(data.user));
-      localStorage.setItem('fluxforge_org', JSON.stringify(data.organization));
+      localStorage.setItem('wolf_shield_token', data.token);
+      localStorage.setItem('wolf_shield_user', JSON.stringify(data.user));
+      localStorage.setItem('wolf_shield_org', JSON.stringify(data.organization));
 
       // Set Supabase session in cookies so server getSession() works (with 3s timeout so we don't stall)
       if (data.token) {

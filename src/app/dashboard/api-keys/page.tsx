@@ -41,13 +41,13 @@ export default function ApiKeysPage() {
   const [copied, setCopied] = useState(false);
 
   useEffect(() => {
-    const token = localStorage.getItem('fluxforge_token');
+    const token = localStorage.getItem('wolf_shield_token');
     if (!token) {
       router.push('/login');
       return;
     }
-    const userData = localStorage.getItem('fluxforge_user');
-    const orgData = localStorage.getItem('fluxforge_org');
+    const userData = localStorage.getItem('wolf_shield_user');
+    const orgData = localStorage.getItem('wolf_shield_org');
     if (userData) setUser(JSON.parse(userData));
     if (orgData) setOrganization(JSON.parse(orgData));
     fetchKeys(token);
@@ -71,7 +71,7 @@ export default function ApiKeysPage() {
 
   const handleCreateKey = async (e: React.FormEvent) => {
     e.preventDefault();
-    const token = localStorage.getItem('fluxforge_token');
+    const token = localStorage.getItem('wolf_shield_token');
     if (!token || !newKeyName.trim()) return;
     setCreating(true);
     setCreatedRawKey(null);
@@ -109,9 +109,9 @@ export default function ApiKeysPage() {
   };
 
   const handleLogout = () => {
-    localStorage.removeItem('fluxforge_token');
-    localStorage.removeItem('fluxforge_user');
-    localStorage.removeItem('fluxforge_org');
+    localStorage.removeItem('wolf_shield_token');
+    localStorage.removeItem('wolf_shield_user');
+    localStorage.removeItem('wolf_shield_org');
     router.push('/');
   };
 

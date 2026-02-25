@@ -69,7 +69,7 @@ export class SecurityKernel {
   /**
    * Extract and validate security context from request.
    * 1) Tries Supabase session from cookies (set by setSupabaseSession after login).
-   * 2) Fallback: Bearer token or fluxforge_token cookie (so dashboard/API work even if Supabase cookies aren't in sync).
+   * 2) Fallback: Bearer token or wolf_shield_token cookie (so dashboard/API work even if Supabase cookies aren't in sync).
    */
   async getSecurityContext(req: NextRequest): Promise<SecurityContext> {
     const supabase = await this.createSecureClient();
@@ -84,10 +84,10 @@ export class SecurityKernel {
       sessionId = session.access_token;
     }
 
-    // Fallback: token from cookie or Authorization header (login/signup set fluxforge_token; dashboard sends Bearer)
+    // Fallback: token from cookie or Authorization header (login/signup set wolf_shield_token; dashboard sends Bearer)
     if (!userId) {
       const token =
-        req.cookies.get('fluxforge_token')?.value ??
+        req.cookies.get('wolf_shield_token')?.value ??
         req.headers.get('authorization')?.replace(/^Bearer\s+/i, '')?.trim();
       if (token) {
         const user = await this.validateSupabaseAccessToken(token);

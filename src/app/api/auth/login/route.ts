@@ -124,7 +124,7 @@ export async function POST(req: NextRequest) {
       refresh_token: authData.session.refresh_token ?? undefined,
     });
 
-    response.cookies.set('fluxforge_token', authData.session.access_token, {
+    response.cookies.set('wolf_shield_token', authData.session.access_token, {
       httpOnly: true,
       secure: process.env.NODE_ENV === 'production',
       sameSite: 'lax',
