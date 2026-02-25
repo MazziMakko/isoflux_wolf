@@ -92,7 +92,7 @@ export default function TermsOfServicePage() {
             <section>
               <h2 className="mb-4 text-2xl font-bold text-white">6. Payment & Refunds</h2>
               <p>
-                <strong>Subscription Fee:</strong> $300/month (flat rate)
+                <strong>Subscription Fee:</strong> $299/month (flat rate)
                 <br />
                 <strong>Billing:</strong> Automatic monthly renewal via Stripe
                 <br />
