@@ -25,7 +25,7 @@ export default function PrivacyPolicyPage() {
             <section>
               <h2 className="mb-4 text-2xl font-bold text-white">1. Overview</h2>
               <p>
-                New Jerusalem Sovereign Holdings, LLC ("we," "us," "our") operates Wolf Shield HUD-Secure Pro
+                New Jerusalem Holdings, LLC ("we," "us," "our"), a Wyoming limited liability company, operates Wolf Shield HUD-Secure Pro
                 ("the Service"). This Privacy Policy explains how we collect, use, store, and protect your information.
               </p>
               <div className="mt-4 rounded border-2 border-blue-500/50 bg-blue-900/20 p-4">

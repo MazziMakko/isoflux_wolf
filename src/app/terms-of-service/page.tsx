@@ -80,7 +80,7 @@ export default function TermsOfServicePage() {
             <section>
               <h2 className="mb-4 text-2xl font-bold text-white">5. Intellectual Property</h2>
               <p>
-                All content, features, and functionality of the Service are owned by New Jerusalem Sovereign Holdings,
+                All content, features, and functionality of the Service are owned by New Jerusalem Holdings,
                 LLC and are protected by copyright, trademark, and other intellectual property laws.
               </p>
               <p className="mt-4">
