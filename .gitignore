@@ -63,3 +63,5 @@ Thumbs.db
 
 # Test
 .jest
+
+SUPERADMIN_CREDENTIALS.md
