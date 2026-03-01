@@ -2,18 +2,29 @@ import type { Metadata } from 'next';
 import { Inter } from 'next/font/google';
 import './globals.css';
 import { GeolocationProvider } from '@/hooks/useGeolocation';
+import { FoundationSchema } from '@/components/seo/FoundationSchema';
 
 const inter = Inter({ subsets: ['latin'], variable: '--font-geist-sans' });
 
 export const metadata: Metadata = {
-  title: 'IsoFlux (The Compliance Wolf) | ISO 20022, Clarity Act & GENIUS Act in Milliseconds',
-  description: 'IsoFlux automates ISO 20022, Clarity Act, and GENIUS Act compliance in milliseconds. The world\'s first compliance reactor for fintechs and credit unions.',
-  keywords: 'ISO 20022, Clarity Act, GENIUS Act, compliance reactor, fintech, compliance automation',
+  title: 'Wolf Shield by IsoFlux | HUD-Compliant Property Management Software',
+  description: 'The only HUD property management platform with a mathematically immutable ledger. Automated recertification alerts, tamper-proof audit trails, and flat $299/mo pricing.',
+  keywords: 'HUD compliance, property management, Wolf Shield, immutable ledger, HOTMA, recertification, affordable housing, subsidized housing',
   authors: [{ name: 'IsoFlux' }],
   openGraph: {
     title: 'Wolf Shield | HUD-Compliant Property Management Software',
-    description: 'The world\'s first compliance reactor. ISO 20022, Clarity Act, GENIUS Act—automated.',
+    description: 'Pass HUD audits. Protect subsidies. $299/month flat fee. Mathematically immutable ledger.',
     type: 'website',
+    url: 'https://isoflux.app',
+    siteName: 'Wolf Shield by IsoFlux',
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'Wolf Shield | HUD-Compliant Property Management',
+    description: 'Pass HUD audits. Protect subsidies. $299/month flat fee.',
+  },
+  alternates: {
+    canonical: 'https://isoflux.app',
   },
 };
 
@@ -24,6 +35,9 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en" suppressHydrationWarning>
+      <head>
+        <FoundationSchema />
+      </head>
       <body className={`${inter.variable} font-sans antialiased`}>
         <GeolocationProvider>
           {children}

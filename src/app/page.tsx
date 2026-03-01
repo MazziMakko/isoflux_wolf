@@ -8,10 +8,13 @@
 import Link from 'next/link';
 import { Card } from '@/components/ui/AnimatedCard';
 import { GlobalFooter } from '@/components/shared/GlobalFooter';
+import { HowToSchema } from '@/components/seo/HowToSchema';
 
 export default function HomePage() {
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-emerald-900 to-slate-900">
+    <>
+      <HowToSchema />
+      <div className="min-h-screen bg-gradient-to-br from-slate-900 via-emerald-900 to-slate-900">
       {/* Hero Section */}
       <section className="relative px-6 py-24 lg:px-8">
         <div className="mx-auto max-w-4xl text-center">
@@ -207,6 +210,7 @@ export default function HomePage() {
       </section>
 
       <GlobalFooter />
-    </div>
+      </div>
+    </>
   );
 }
