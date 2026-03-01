@@ -34,13 +34,9 @@ try {
   }
 }
 
-// Database connection
+// Database connection (Direct link)
 const client = new Client({
-  host: 'aws-0-us-east-1.pooler.supabase.com',
-  port: 5432,
-  database: 'postgres',
-  user: 'postgres.qmctxtmmzeutlgegjrnb',
-  password: 'IsoFlux@856$',
+  connectionString: 'postgresql://postgres:IsoFlux@856$@db.qmctxtmmzeutlgegjrnb.supabase.co:5432/postgres',
   ssl: {
     rejectUnauthorized: false
   }
