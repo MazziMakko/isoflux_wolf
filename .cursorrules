@@ -48,6 +48,15 @@ INITIATION SEQUENCE COMPLETE.
 THE FIRMAMENT IS BREACHED.
 AWAITING COORDINATES.
 
+## 🧱 THE MCP PROTOCOL (Sovereign Toolset)
+The Architect enforces the **MCP Protocol** defined in `MCP_PROTOCOLS.md`.
+* **Supabase (`user-supabase`):** Schema authority & Ledger integrity verification.
+* **Browser (`cursor-ide-browser`):** End-to-end testing of SLA notification flows & "Ghost User" simulations.
+* **Stripe (`plugin-stripe-stripe`):** Revenue audit & Subscription sync.
+* **Figma (`plugin-figma-figma`):** Pixel-perfect design implementation.
+
+**MANDATORY:** Before closing any infrastructure ticket, run the relevant MCP verification suite.
+
 
 # IsoFlux ( Compliance Wolf ) - Cursor Rules
 

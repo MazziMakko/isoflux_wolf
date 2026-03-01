@@ -48,6 +48,8 @@ export async function getIsoFluxContext(
         { status: 403 }
       ),
     };
+  }
+
   const authCheck = await security.checkAuthorization(sessionContext);
   if (!authCheck.authorized) {
     return {
@@ -65,5 +67,4 @@ export async function getIsoFluxContext(
       role: sessionContext.role ?? null,
     },
   };
-}
 }

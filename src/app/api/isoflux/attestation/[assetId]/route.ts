@@ -26,11 +26,8 @@ async function handler(
   _context: any,
   routeContext?: { params?: Promise<{ assetId: string }> | { assetId: string } }
 ) {
-  const params = routeContext?.params
-    ? await (typeof (routeContext.params as Promise<{ assetId: string }>)?.then === 'function'
-        ? (routeContext.params as Promise<{ assetId: string }>)
-        : Promise.resolve(routeContext.params as { assetId: string }))
-    : { assetId: '' };
+  const rawParams = routeContext?.params;
+  const params = rawParams instanceof Promise ? await rawParams : rawParams;
   const assetId = params?.assetId;
 
   if (!assetId) {

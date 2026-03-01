@@ -16,7 +16,7 @@ export function withIsoFluxAuth(
   handler: (
     req: NextRequest,
     context: IsoFluxContext,
-    routeContext?: { params?: Promise<Record<string, string>> | Record<string, string> }
+    routeContext?: any
   ) => Promise<NextResponse>,
   options?: { requiredRole?: string }
 ) {
@@ -30,7 +30,7 @@ export function withIsoFluxAuth(
 
   return async (
     req: NextRequest,
-    routeContext?: { params?: Promise<Record<string, string>> | Record<string, string> }
+    routeContext: any
   ) => {
     const result = await getIsoFluxContext(req);
     if ('error' in result) return result.error;
@@ -55,6 +55,9 @@ export function withIsoFluxAuth(
     }
     if (Math.random() < 0.01) pruneRateLimitStore();
 
-    return handler(req, context, routeContext);
+    const rawParams = routeContext?.params;
+    const params = rawParams instanceof Promise ? await rawParams : rawParams;
+
+    return handler(req, context, { params });
   };
 }

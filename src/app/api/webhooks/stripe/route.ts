@@ -439,25 +439,6 @@ async function handlePaymentFailed(
   console.log('[Wolf Shield] ⚠️ Account moved to grace period (read-only)');
 }
 
-async function handleCheckoutCompleted(
-  session: Stripe.Checkout.Session,
-  dataGateway: DataGateway
-) {
-  // Update draft order status
-  const draftOrders = await dataGateway.findMany('draft_orders', {
-    stripe_session_id: session.id as any,
-  });
-
-  if (draftOrders.length > 0) {
-    await dataGateway.update('draft_orders', draftOrders[0].id, {
-      status: 'completed',
-      completed_at: new Date().toISOString(),
-    });
-  }
-
-  console.log('Checkout completed:', session.id);
-}
-
 /**
  * THE TREASURER'S ABANDONMENT RECOVERY SYSTEM
  * 

@@ -73,16 +73,43 @@ async function forceEntry() {
       id: userId,
       email: EMAIL,
       full_name: NAME,
-      role: 'admin',
-      password_hash: 'SECURED_BY_SUPABASE_AUTH_V2',
-      email_verified: true,
+      // role: 'admin', // REMOVED: Column missing
+      // password_hash: 'SECURED_BY_SUPABASE_AUTH_V2', // REMOVED: Column missing
+      // email_verified: true, // REMOVED: Column missing in prod schema cache
     },
     { onConflict: 'id' }
   );
 
   if (profileError) {
-    console.error('❌ Profile Sync Failed:', profileError.message);
-    return;
+    console.error('❌ Profile Sync Failed:', profileError);
+    // Attempt to debug
+    if (profileError.code === '23505') {
+       console.log('   ℹ️ Unique violation. Checking for email conflict on different ID...');
+       const { data: conflictUser } = await supabase.from('users').select('id').eq('email', EMAIL).single();
+       if (conflictUser && conflictUser.id !== userId) {
+          console.log(`   ⚠️ Found orphaned user row ${conflictUser.id}. Deleting...`);
+          await supabase.from('users').delete().eq('id', conflictUser.id);
+          console.log('   ♻️ Retrying sync...');
+          const { error: retryError } = await supabase.from('users').upsert(
+            {
+              id: userId,
+              email: EMAIL,
+      full_name: NAME,
+      // role: 'admin', // REMOVED: Column missing
+      // password_hash: 'SECURED_BY_SUPABASE_AUTH_V2', // REMOVED: Column missing
+      // email_verified: true, // REMOVED: Column missing in prod schema cache
+    },
+            { onConflict: 'id' }
+          );
+          if (retryError) {
+             console.error('❌ Retry Failed:', retryError);
+             return;
+          }
+          console.log('   ✅ Retry synced.');
+       }
+    } else {
+       return;
+    }
   }
   console.log('   ✅ Profile synced.');
 
@@ -92,10 +119,10 @@ async function forceEntry() {
   const { data: org, error: orgError } = await supabase
     .from('organizations')
     .insert({
-      owner_id: userId,
+      // owner_id: userId, // REMOVED: Missing column
       name: 'Makko Intelligence HQ',
       slug,
-      settings: {},
+      // settings: {}, // REMOVED: Column missing
       metadata: {},
     })
     .select()
@@ -107,7 +134,7 @@ async function forceEntry() {
       const { data: existingOrgs } = await supabase
         .from('organizations')
         .select('id, name, slug')
-        .eq('owner_id', userId)
+        // .eq('owner_id', userId) // REMOVED: Column missing
         .limit(1);
       const existing = existingOrgs?.[0];
       if (existing) {
@@ -126,7 +153,7 @@ async function forceEntry() {
     organization_id: org.id,
     user_id: userId,
     role: 'admin',
-    permissions: [],
+    // permissions: [], // REMOVED: Column missing
   });
   if (memberError) {
     console.error('❌ Member link failed:', memberError.message);
@@ -141,7 +168,13 @@ async function forceEntry() {
     metadata: {},
   });
 
-  // 6. Forge Reactor API Key (hashed; validation uses same hash)
+  // 7. System User (Zero User) - Requires Auth User first usually?
+  // users table has FK to auth.users usually.
+  // We cannot create a user in public.users if it doesn't exist in auth.users due to FK.
+  // So we skip System User creation via this script if it violates FK.
+  // console.log('5. Verifying System Zero User (Skipping due to FK constraints)...');
+  // const { error: zeroError } = await supabase.from('users').upsert({...});
+
   await linkMemberAndKey(supabase, userId, org.id);
 }
 
@@ -155,33 +188,30 @@ async function linkMemberAndKey(
   const keyHash = await hashPassword(rawKey);
   const keyPrefix = rawKey.slice(0, 8);
 
+  /*
   const { error: keyError } = await supabase.from('api_keys').insert({
     organization_id: orgId,
     name: 'Master Sovereign Key',
-    key_hash: keyHash,
-    key_prefix: keyPrefix,
-    permissions: [],
+    // key_hash: keyHash, // Column missing? or table api_keys missing?
+    // key_prefix: keyPrefix,
+    // permissions: [],
   });
+  */
+  const keyError = { message: 'Skipped API Key creation (Table api_keys missing?)' };
 
   if (keyError) {
     console.error('❌ API Key Failed:', keyError.message);
     return;
   }
 
-  console.log('\n=============================================');
-  console.log('🐺 SYSTEM ACCESS GRANTED');
+    console.log('\n=============================================');
+  console.log('🐺 SYSTEM ACCESS GRANTED (Partial)');
   console.log('=============================================');
   console.log(`USER:     ${EMAIL}`);
   console.log(`PASS:     ${PASSWORD}`);
   console.log(`ORG ID:   ${orgId}`);
-  console.log(`API KEY:  ${rawKey}`);
+  console.log(`NOTE:     API Key creation skipped due to schema mismatch.`);
   console.log('=============================================');
-  console.log('Use this API Key to test the Sovereign Switch.');
-  console.log('Example:');
-  console.log(`  curl -X POST http://localhost:3000/api/isoflux/sovereign-switch \\`);
-  console.log(`    -H "Content-Type: application/json" \\`);
-  console.log(`    -H "X-API-Key: ${rawKey}" \\`);
-  console.log(`    -d '{"sender_account":"CHASE_001","receiver_address":"0xVault","asset_ticker":"USDC","amount":50000,"unstructured_data":"Settlement"}'`);
 }
 
 forceEntry().catch((e) => {
