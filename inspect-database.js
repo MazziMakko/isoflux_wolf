@@ -34,7 +34,7 @@ try {
 }
 
 // Database connection (Direct link with URL-encoded password)
-// Password: IsoFlux@856$ → URL encoded: IsoFlux%40856%24
+// Password: IsoFlux@856$ → URL encoded: IsoFlux%40856%24 (@ → %40, $ → %24)
 const client = new Client({
   connectionString: 'postgresql://postgres:IsoFlux%40856%24@db.qmctxtmmzeutlgegjrnb.supabase.co:5432/postgres',
   ssl: {
