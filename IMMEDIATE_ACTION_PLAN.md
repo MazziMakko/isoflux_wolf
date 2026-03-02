@@ -17,14 +17,31 @@
 **Status:** Complete - Prisma client generated successfully
 
 ### **Fix 2: Sync Database Schema** ⏳ READY TO RUN
-```bash
-npx prisma db push
-```
-**What it does:** Syncs Prisma schema with Supabase, fixes schema cache issues  
-**Time:** ~30 seconds  
+
+**CRITICAL UPDATE:** Prisma v7 had breaking changes. We've downgraded to Prisma v6 and created a comprehensive SQL fix.
+
+**ACTION REQUIRED:**
+1. Go to: https://supabase.com/dashboard
+2. Select your project → **SQL Editor** → **New Query**
+3. Open the file: `SCHEMA_SYNC_FIX.sql` in this repository
+4. Copy the ENTIRE contents and paste into Supabase SQL Editor
+5. Click **Run**
+
+**What it does:** 
+- Adds all missing columns to `users` table (role, email_verified, etc.)
+- Creates Super Admin profile
+- Sets up organization and subscription
+- Fixes schema cache issues
+
+**Time:** ~1 minute  
 **Run this now!**
 
-### **Fix 3: Create Super Admin Profile** ⏳ WAITING FOR YOU
+### **Fix 3: Generate Prisma Client (v6)** ✅ NEXT
+```bash
+npx prisma generate
+```
+**What it does:** Regenerates Prisma client with v6 compatibility  
+**Time:** ~10 seconds
 
 **Option A: SQL in Supabase (RECOMMENDED - 2 minutes)**
 1. Go to: https://supabase.com/dashboard

@@ -24,7 +24,7 @@
   },
   "dependencies": {
     "@hookform/resolvers": "^3.3.4",
-    "@prisma/client": "^7.4.1",
+    "@prisma/client": "^6.19.2",
     "@radix-ui/react-dialog": "^1.0.5",
     "@radix-ui/react-dropdown-menu": "^2.0.6",
     "@radix-ui/react-select": "^2.0.0",
@@ -67,7 +67,7 @@
     "papaparse": "^5.5.3",
     "pdfkit": "^0.15.0",
     "postcss": "^8.5.6",
-    "prisma": "^7.4.1",
+    "prisma": "^6.19.2",
     "r3f-perf": "^7.2.3",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
