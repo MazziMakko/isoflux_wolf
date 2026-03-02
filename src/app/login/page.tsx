@@ -1,19 +1,44 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect, Suspense } from 'react';
 import Link from 'next/link';
-import { useRouter } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { Zap, Mail, Lock } from 'lucide-react';
 import { getSupabaseBrowser, setSupabaseSession } from '@/lib/supabase-browser';
 
-export default function LoginPage() {
+function LoginForm() {
   const router = useRouter();
+  const searchParams = useSearchParams();
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const [formData, setFormData] = useState({
     email: '',
     password: '',
   });
+
+  // FAILSAFE: If redirected from middleware with autoretry=1, attempt to restore session
+  useEffect(() => {
+    const autoRetry = searchParams.get('autoretry');
+    const profileMissing = searchParams.get('profile_missing');
+    const wolfToken = localStorage.getItem('wolf_shield_token');
+    const wolfRefreshToken = localStorage.getItem('wolf_shield_refresh_token');
+
+    if (autoRetry === '1' && wolfToken) {
+      // Attempt to restore Supabase session
+      setSupabaseSession(wolfToken, wolfRefreshToken ?? undefined)
+        .then(() => {
+          const redirect = searchParams.get('redirect') || '/dashboard';
+          router.push(redirect);
+        })
+        .catch(() => {
+          setError('Session expired. Please log in again.');
+        });
+    }
+
+    if (profileMissing === '1') {
+      setError('Your account profile is incomplete. Please log in again to restore it.');
+    }
+  }, [searchParams, router]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -37,16 +62,20 @@ export default function LoginPage() {
       localStorage.setItem('wolf_shield_token', data.token);
       localStorage.setItem('wolf_shield_user', JSON.stringify(data.user));
       localStorage.setItem('wolf_shield_org', JSON.stringify(data.organization));
+      
+      // Store refresh token for session restoration
+      if (data.refresh_token) {
+        localStorage.setItem('wolf_shield_refresh_token', data.refresh_token);
+      }
 
-      // Set Supabase session in cookies so server getSession() works (with 3s timeout so we don't stall)
+      // Set Supabase session in cookies so server getSession() works
+      // CRITICAL: Do NOT timeout here; session must be set for middleware
       if (data.token) {
         try {
-          await Promise.race([
-            setSupabaseSession(data.token, data.refresh_token),
-            new Promise((_, reject) => setTimeout(() => reject(new Error('timeout')), 3000)),
-          ]);
-        } catch (_) {
-          // Proceed anyway; API routes will use Bearer / fluxforge_token cookie
+          await setSupabaseSession(data.token, data.refresh_token);
+        } catch (sessionError) {
+          console.error('[Login] Supabase session set failed:', sessionError);
+          // Non-fatal; API routes will use Bearer token from cookie
         }
       }
 
@@ -138,5 +167,17 @@ export default function LoginPage() {
         </div>
       </div>
     </div>
+  );
+}
+
+export default function LoginPage() {
+  return (
+    <Suspense fallback={
+      <div className="min-h-screen section-gradient flex items-center justify-center px-4">
+        <div className="text-xl text-emerald-400 animate-pulse">⚡ Loading...</div>
+      </div>
+    }>
+      <LoginForm />
+    </Suspense>
   );
 }

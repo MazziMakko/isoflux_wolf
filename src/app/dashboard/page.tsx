@@ -34,8 +34,8 @@ export default function DashboardPage() {
       return;
     }
 
-    const userData = localStorage.getItem('fluxforge_user');
-    const orgData = localStorage.getItem('fluxforge_org');
+    const userData = localStorage.getItem('wolf_shield_user');
+    const orgData = localStorage.getItem('wolf_shield_org');
 
     if (userData) {
       try {
@@ -105,9 +105,9 @@ export default function DashboardPage() {
   };
 
   const handleLogout = () => {
-    localStorage.removeItem('fluxforge_token');
-    localStorage.removeItem('fluxforge_user');
-    localStorage.removeItem('fluxforge_org');
+    localStorage.removeItem('wolf_shield_token');
+    localStorage.removeItem('wolf_shield_user');
+    localStorage.removeItem('wolf_shield_org');
     router.push('/');
   };
 

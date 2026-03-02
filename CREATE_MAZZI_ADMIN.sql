@@ -56,7 +56,7 @@ VALUES (
   'USER_ID_HERE'::uuid,  -- Replace with actual UUID
   'thenationofmazzi@gmail.com',
   'Mazzi Makko',
-  'SUPER_ADMIN',
+  'super_admin',  -- CRITICAL: Database stores lowercase with underscore
   'managed_by_supabase_auth',
   true,
   now(),
@@ -64,7 +64,7 @@ VALUES (
 )
 ON CONFLICT (id) 
 DO UPDATE SET
-  role = 'SUPER_ADMIN',
+  role = 'super_admin',
   full_name = 'Mazzi Makko',
   email_verified = true,
   updated_at = now();
@@ -122,7 +122,7 @@ INSERT INTO public.subscriptions (
 VALUES (
   'ORG_ID_HERE'::uuid,  -- Replace with organization ID
   'enterprise',
-  'ACTIVE',
+  'active',  -- CRITICAL: Database stores lowercase
   '{"lifetime_access": true, "platform_admin": true}'::jsonb,
   now(),
   now()

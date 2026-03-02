@@ -12,6 +12,10 @@
     {
       "path": "/api/cron/trial-notifications",
       "schedule": "0 9 * * *"
+    },
+    {
+      "path": "/api/cron/hunter-scout",
+      "schedule": "0 8 * * 2,4"
     }
   ]
 }

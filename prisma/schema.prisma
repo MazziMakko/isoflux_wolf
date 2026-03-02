@@ -102,6 +102,7 @@ model User {
   auditLogs            AuditLog[]
   createdLedgerEntries HudAppendLedger[]
   tenantProfiles       Tenant[]
+  reviewedHunterLeads  HunterLead[]      @relation("HunterLeadReviewer")
 
   @@index([email])
   @@index([role])
@@ -415,4 +416,72 @@ model ApiKey {
   @@index([organizationId])
   @@index([keyHash])
   @@map("api_keys")
+}
+
+// =====================================================
+// HUNTER ENGINE - AUTONOMOUS LEAD HARVESTING
+// =====================================================
+
+enum HunterLeadStatus {
+  PENDING  @map("pending")
+  APPROVED @map("approved")
+  REJECTED @map("rejected")
+  CONTACTED @map("contacted")
+
+  @@map("hunter_lead_status")
+}
+
+model HunterLead {
+  id                   String            @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  companyName          String            @map("company_name") @db.VarChar(255)
+  email                String?           @db.VarChar(255)
+  phone                String?           @db.VarChar(50)
+  website              String?           @db.VarChar(500)
+  address              String?
+  city                 String?           @db.VarChar(100)
+  state                String?           @db.VarChar(2)
+  zipCode              String?           @map("zip_code") @db.VarChar(10)
+  estimatedUnits       Int?              @map("estimated_units")
+  techScore            Int?              @map("tech_score") // 0-100 likelihood of tech adoption (AI-generated)
+  painPointHypothesis  String?           @map("pain_point_hypothesis") // AI-generated pain points analysis
+  aiScoringAttempts    Int               @default(0) @map("ai_scoring_attempts") // Number of AI scoring retries
+  lastScoringError     String?           @map("last_scoring_error") // Last AI scoring error message
+  status               HunterLeadStatus  @default(PENDING)
+  sourceUrl            String?           @map("source_url") @db.VarChar(1000)
+  sourceType           String?           @map("source_type") @db.VarChar(100) // e.g., "NJ_HMFA", "HUD_PUBLIC", "MANUAL"
+  metadata             Json              @default("{}") // Store scraper-specific data
+  scoutedAt            DateTime          @default(now()) @map("scouted_at") @db.Timestamptz
+  reviewedAt           DateTime?         @map("reviewed_at") @db.Timestamptz
+  reviewedBy           String?           @map("reviewed_by") @db.Uuid
+  contactedAt          DateTime?         @map("contacted_at") @db.Timestamptz
+  notes                String?
+  createdAt            DateTime          @default(now()) @map("created_at") @db.Timestamptz
+  updatedAt            DateTime          @updatedAt @map("updated_at") @db.Timestamptz
+
+  // Relations
+  reviewer User? @relation("HunterLeadReviewer", fields: [reviewedBy], references: [id])
+
+  @@unique([companyName, email])
+  @@index([status])
+  @@index([techScore])
+  @@index([scoutedAt])
+  @@index([aiScoringAttempts])
+  @@map("hunter_leads")
+}
+
+model HunterScoutRun {
+  id             String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  sourceType     String   @map("source_type") @db.VarChar(100)
+  leadsFound     Int      @default(0) @map("leads_found")
+  leadsCreated   Int      @default(0) @map("leads_created")
+  leadsDuplicate Int      @default(0) @map("leads_duplicate")
+  status         String   @default("running") @db.VarChar(50) // running, completed, failed
+  errorMessage   String?  @map("error_message")
+  metadata       Json     @default("{}")
+  startedAt      DateTime @default(now()) @map("started_at") @db.Timestamptz
+  completedAt    DateTime? @map("completed_at") @db.Timestamptz
+
+  @@index([sourceType])
+  @@index([startedAt])
+  @@map("hunter_scout_runs")
 }

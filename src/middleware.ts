@@ -84,6 +84,17 @@ export async function middleware(request: NextRequest) {
     } = await supabase.auth.getUser();
 
     if (authError || !user) {
+      // FAILSAFE: If no Supabase session, but we have wolf_shield_token cookie,
+      // redirect to login with ?autoretry=1 so login page can attempt to restore session
+      const wolfToken = request.cookies.get('wolf_shield_token')?.value;
+      
+      if (wolfToken && pathname !== '/login') {
+        const loginUrl = new URL('/login', request.url);
+        loginUrl.searchParams.set('redirect', pathname);
+        loginUrl.searchParams.set('autoretry', '1');
+        return NextResponse.redirect(loginUrl);
+      }
+      
       const loginUrl = new URL('/login', request.url);
       loginUrl.searchParams.set('redirect', pathname);
       return NextResponse.redirect(loginUrl);
@@ -97,13 +108,31 @@ export async function middleware(request: NextRequest) {
       .single();
 
     if (!userData) {
+      // SELF-HEAL: Profile missing but auth exists - this should not happen
+      // Log and redirect to a profile creation flow (or login to trigger auto-create)
+      console.error('[Middleware] Profile missing for authenticated user:', user.id, user.email);
       const loginUrl = new URL('/login', request.url);
+      loginUrl.searchParams.set('redirect', pathname);
+      loginUrl.searchParams.set('profile_missing', '1');
       return NextResponse.redirect(loginUrl);
     }
 
-    const userRole = userData.role as UserRole;
+    // Database stores role as lowercase with underscore (e.g., "super_admin")
+    const userRole = userData.role as string;
 
-    // Fetch organization and subscription
+    // SUPER_ADMIN BYPASS: Super admins can access all routes regardless of subscription
+    if (userRole === 'super_admin') {
+      // Still apply role-based routing enforcement, but skip subscription checks
+      // Convert to uppercase for compliance router
+      const roleCheck = enforceRoleAccess('SUPER_ADMIN' as UserRole, pathname);
+      if (!roleCheck.allowed && roleCheck.redirect) {
+        return NextResponse.redirect(new URL(roleCheck.redirect, request.url));
+      }
+      
+      return applySecurityHeaders(response);
+    }
+
+    // Fetch organization and subscription for non-Super-Admin users
     const { data: membershipData } = await supabase
       .from('organization_members')
       .select(
@@ -132,17 +161,18 @@ export async function middleware(request: NextRequest) {
         const subscriptionStatus = subscription.status as SubscriptionStatus;
 
         // CRITICAL: Only trialing or active can access dashboard
-        const allowedStatuses: SubscriptionStatus[] = ['trialing', 'active'];
+        // Note: Database stores lowercase due to Prisma @map directives
+        const allowedStatuses = ['trialing', 'active'];
 
         if (!allowedStatuses.includes(subscriptionStatus)) {
           // If PAST_DUE, redirect to billing (unless already there)
-          if (subscriptionStatus === 'PAST_DUE' && !pathname.startsWith('/billing')) {
+          if (subscriptionStatus === 'past_due' && !pathname.startsWith('/billing')) {
             return NextResponse.redirect(new URL('/billing', request.url));
           }
 
           // If CANCELLED or INCOMPLETE, redirect to home
           if (
-            (subscriptionStatus === 'CANCELLED' || subscriptionStatus === 'INCOMPLETE') &&
+            (subscriptionStatus === 'cancelled' || subscriptionStatus === 'incomplete') &&
             !pathname.startsWith('/billing')
           ) {
             return NextResponse.redirect(new URL('/', request.url));
@@ -152,7 +182,9 @@ export async function middleware(request: NextRequest) {
     }
 
     // THE WOLF SHIELD: Enforce role-based access
-    const roleCheck = enforceRoleAccess(userRole, pathname);
+    // Convert database role to uppercase for compliance router
+    const roleForRouter = userRole.toUpperCase() as UserRole;
+    const roleCheck = enforceRoleAccess(roleForRouter, pathname);
     if (!roleCheck.allowed && roleCheck.redirect) {
       return NextResponse.redirect(new URL(roleCheck.redirect, request.url));
     }

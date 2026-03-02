@@ -76,8 +76,9 @@ async function createMazziAdmin() {
         id: userId,
         email: 'thenationofmazzi@gmail.com',
         full_name: 'Mazzi Makko',
-        role: 'SUPER_ADMIN',
+        role: 'super_admin', // CRITICAL: Database stores lowercase with underscore
         password_hash: 'managed_by_supabase_auth',
+        email_verified: true,
         created_at: new Date().toISOString(),
         updated_at: new Date().toISOString(),
       });
@@ -135,7 +136,7 @@ async function createMazziAdmin() {
       .upsert({
         organization_id: orgId,
         tier: 'enterprise',
-        status: 'ACTIVE',
+        status: 'active', // CRITICAL: Database stores lowercase
         metadata: { 
           lifetime_access: true, 
           platform_admin: true,

@@ -64,11 +64,11 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    // 4. Update subscription status from TRIALING to ACTIVE
+    // 4. Update subscription status from trialing to active
     const subscription = await dataGateway.getActiveSubscription(organization.id);
-    if (subscription && subscription.status === 'TRIALING') {
+    if (subscription && subscription.status === 'trialing') {
       await dataGateway.update('subscriptions', subscription.id, {
-        status: 'ACTIVE',
+        status: 'active',  // CRITICAL: Database stores lowercase
         metadata: { email_verified: true, verified_at: new Date().toISOString() },
         updated_at: new Date().toISOString(),
       });

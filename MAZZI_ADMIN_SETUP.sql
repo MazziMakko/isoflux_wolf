@@ -33,7 +33,7 @@ INSERT INTO auth.users (
 
 -- Then, upgrade the user to SUPER_ADMIN role
 UPDATE public.users
-SET role = 'SUPER_ADMIN'
+SET role = 'super_admin'  -- CRITICAL: Database stores lowercase with underscore
 WHERE email = 'thenationofmazzi@gmail.com';
 
 -- Verify the update
@@ -70,7 +70,7 @@ RETURNING *;
 -- =====================================================
 -- EXPECTED RESULT:
 -- Mazzi's account should now have:
--- - role: 'SUPER_ADMIN'
+-- - role: 'super_admin' (lowercase in database)
 -- - Full dashboard access
 -- - Ability to manage all organizations
 -- =====================================================
