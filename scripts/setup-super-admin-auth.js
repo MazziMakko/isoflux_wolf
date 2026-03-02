@@ -89,24 +89,42 @@ async function setupSuperAdmin() {
     // Update or create profile in public.users
     console.log('\nStep 3: Updating profile in public.users...');
     
-    const { data: profile, error: profileError } = await supabase
+    // First check if profile exists
+    const { data: existingProfile } = await supabase
       .from('users')
-      .upsert({
-        id: authUser.id,
-        email: SUPER_ADMIN_EMAIL,
-        full_name: SUPER_ADMIN_NAME,
-        role: 'super_admin', // lowercase as stored in DB
-        email_verified: true,
-        password_hash: 'managed_by_supabase_auth',
-      }, {
-        onConflict: 'id'
-      })
-      .select()
+      .select('*')
+      .eq('id', authUser.id)
       .single();
 
-    if (profileError) {
-      console.error('❌ Failed to update profile:', profileError.message);
-      throw profileError;
+    if (existingProfile) {
+      console.log('   Profile already exists, updating role...');
+      const { error: updateError } = await supabase
+        .from('users')
+        .update({
+          full_name: SUPER_ADMIN_NAME,
+          role: 'super_admin', // lowercase as stored in DB
+        })
+        .eq('id', authUser.id);
+
+      if (updateError) {
+        console.error('❌ Failed to update profile:', updateError.message);
+        throw updateError;
+      }
+    } else {
+      console.log('   Creating new profile...');
+      const { error: insertError } = await supabase
+        .from('users')
+        .insert({
+          id: authUser.id,
+          email: SUPER_ADMIN_EMAIL,
+          full_name: SUPER_ADMIN_NAME,
+          role: 'super_admin',
+        });
+
+      if (insertError) {
+        console.error('❌ Failed to create profile:', insertError.message);
+        throw insertError;
+      }
     }
 
     console.log('✅ Profile updated in public.users');
